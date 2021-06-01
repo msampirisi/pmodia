@@ -1,0 +1,33 @@
+CXX = g++
+#CFLAGS = -std=c99 -Wall -I.
+CXXFLAGS = -O3 -Wall -Wunused-variable
+CXXINCLUDE = -I/usr/local/include
+
+LINKER = g++ -o
+LFLAGS = -Wall -lm
+LLIB = -L/usr/local/lib -lwiringPi -lwiringPiDev -lpthread
+
+SRCDIR = src
+OBJDIR = obj
+BINDIR = bin
+rm = rm -f
+
+#ad5933.o: ad5933.c ad5933.h
+#	@echo "Compilando "$<".."
+#	${CXX} ${CXXFLAGS} -c ${SRCDIR}/ad5933.c
+#	@echo "Compilando "$<" finalizado."
+
+all: clean $(BINDIR)/pmodia.test
+	@echo "Proceso Finalizado."
+
+$(BINDIR)/pmodia.test:
+	@echo "Compilando "$@" - Iniciando"
+	$(CXX) $(CXXFLAGS) $(CXXINCLUDE) -pipe $(LFLAGS) $(LLIB) -o $(BINDIR)/pmodia.test $(SRCDIR)/test.c
+	@echo "Compilando "$@" - Finalizado"
+
+clean:
+	@echo "Limpiando archivos ejecutables/objeto"
+	rm -f $(BINDIR)/pmodia.test
+	@echo "Ejecutables removido."
+
+
