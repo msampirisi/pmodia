@@ -24,8 +24,6 @@
 #include <wiringPiI2C.h>
 #include <time.h>
 #include <unistd.h>
-#include <iostream>
-#include <fstream>
 
 #include "AD5933.h"
 #include "AD5933.c"
@@ -54,6 +52,16 @@ float AD5933_CALIBRATION_IMPEDANCE = 12000;
 unsigned long  freq_iter = 1;
 char string_tmp;
 
+void formatTime(char *out){
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	sprintf(out, "%04d%02d%02d_%02d%02d%02d", timeinfo->tm_year+1900, timeinfo->tm_mon+1, timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+}
+
+
 int main (void)
 {
         // Setup wiringPi library to use i2c module
@@ -71,11 +79,21 @@ int main (void)
         }else{
 			printf("I2C device %x hash.\n",i2cdevice);
 		}
-        
+
+		time_t rawtime;
+		struct tm * timeinfo;
+		time (&rawtime);
+		timeinfo = localtime(&rawtime);
+		printf("\nCurrent time is : %s", ctime(&rawtime));
+		char outFormatTime[40];
+		formatTime(outFormatTime);
+		printf("Format Time : %s \n", outFormatTime);
+
 		double temperatureInicial = 0;
-        printf("\n Obteniendo Temperatura : \n");
+        printf("\nObteniendo Temperatura :\n");
 		temperatureInicial = AD5933_GetTemperatureV2();
         printf("Temperature %f",temperatureInicial);
+
         
         printf("\n\n");
         printf("/******************************************************************************\n");
@@ -83,6 +101,7 @@ int main (void)
         printf("*-----------------------------------------------------------------------------*\n");
         printf("* @authors: Manuel Blanco Valentin (mbvalentin@cbpf.br) - Barcelona (Spain)   *\n");
         printf("*           Yann Le Guevel (...) - Strasbourg (France)                        *\n");
+        printf("*           Maximiliano Sampirisi (msampirisi@gmail.com) - Ushuaia (Argentina)*\n");
         printf("*                                                                             *\n");
         printf("* @creation: June/2017 at CBPF (Brazil)                                       *\n");
         printf("*                                                                             *\n");
@@ -187,9 +206,8 @@ int main (void)
 	    gainFactor = AD5933_CalculateGainFactorAndSystemPhase(AD5933_CALIBRATION_IMPEDANCE,
 									AD5933_FUNCTION_REPEAT_FREQ, &SystemPhase);
 	    printf(" Done!...\n");
-	    printf("Gain Factor  estimated to be: %g\n",gainFactor);
-	    printf("System Phase estimated to be: %g\n",SystemPhase);
-
+	    printf("---> Gain Factor  estimated to be: %g\n",gainFactor);
+	    printf("---> System Phase estimated to be: %g\n",SystemPhase);
         
         // Make a single impedance measurement to make sure we have  
 		// calibrated the board correctly
@@ -197,20 +215,27 @@ int main (void)
 								  AD5933_FUNCTION_REPEAT_FREQ);
 	    printf("Recalculated Z = %f .. Original one had a value of: %f ... Error = %f%%\n",(1/(gainFactor*magnitude)),AD5933_CALIBRATION_IMPEDANCE,100*abs((AD5933_CALIBRATION_IMPEDANCE-(1/(gainFactor*magnitude))))/AD5933_CALIBRATION_IMPEDANCE);
         
-        printf("\nReplace calibration component with desired one for measurement and press any key");
+        //printf("\nReplace calibration component with desired one for measurement and press any key");
 		// wait for user input
+		//scanf("%s",&string_tmp);
+
+		printf("Measurement Identification : ");
 		scanf("%s",&string_tmp);
-		
+		printf("\nIdMedicion : %s_%g_%s\n",&string_tmp,Calibration_Impedance,outFormatTime);
+
 		printf("Debug: Obteniendo el registro de status.\n");		
 			
 		status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
-		
+
 		printf("Debug: Inicializando archivos de salida.\n");		
 			
         // Initialize variables for output txt file and gnuplot
-        FILE *fout = fopen("out.txt","w");
 		FILE *gnuplot = popen("gnuplot -persistent", "w");
-		FILE *fout2 = fopen("out.ext.txt","w");
+        FILE *fout = fopen("out.txt","w");
+
+		char fileName2[100];
+		sprintf(fileName2, "%s_%g_%s.txt", &string_tmp,Calibration_Impedance,outFormatTime);
+		FILE *fout2 = fopen(fileName2,"w");
 
 		signed short RealPart = 0;
 		signed short ImagPart = 0;

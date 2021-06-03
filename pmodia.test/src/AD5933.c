@@ -266,14 +266,14 @@ float AD5933_GetTemperatureV2(void)
                          1);
 						 */
 	statusControl = AD5933_GetRegisterValue(AD5933_REG_CONTROL_HB,2);
-	printf("Before statusControl : %d - %x \n",statusControl, statusControl);
+	//printf("Before statusControl : %d - %x \n",statusControl, statusControl);
 	//scanf("%s",&string_tmp2);
 
     AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,0x91,1);
     AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB,0x00,1);
 
 	statusControl = AD5933_GetRegisterValue(AD5933_REG_CONTROL_HB,2);
-	printf("After statusControl : %d - %x \n",statusControl, statusControl);
+	//printf("After statusControl : %d - %x \n",statusControl, statusControl);
 	//scanf("%s",&string_tmp2);
 
     while((status & AD5933_STAT_TEMP_VALID) == 0)
@@ -299,6 +299,7 @@ float AD5933_GetTemperatureV2(void)
         temperature /= 32;
     }
 
+	/*
 	printf("Debug");
 	printf("Registro \t valor\n");
 	printf("0x80\t%x\n",AD5933_GetRegisterValue(0x80,2));
@@ -312,7 +313,7 @@ float AD5933_GetTemperatureV2(void)
 	printf("0x92\t%x\n",AD5933_GetRegisterValue(0x92,2));
 	printf("0x94\t%x\n",AD5933_GetRegisterValue(0x94,2));
 	printf("0x96\t%x\n",AD5933_GetRegisterValue(0x96,2));
-
+	*/
 
     AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,0x00,1);
     AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB,0x00,1);
