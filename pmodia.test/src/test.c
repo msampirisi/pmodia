@@ -205,7 +205,7 @@ int main (void)
 									
 	    gainFactor = AD5933_CalculateGainFactorAndSystemPhase(AD5933_CALIBRATION_IMPEDANCE,
 									AD5933_FUNCTION_REPEAT_FREQ, &SystemPhase);
-	    printf(" Done!...\n");
+	    printf("Done!...\n");
 	    printf("---> Gain Factor  estimated to be: %g\n",gainFactor);
 	    printf("---> System Phase estimated to be: %g\n",SystemPhase);
         
@@ -213,13 +213,13 @@ int main (void)
 		// calibrated the board correctly
 		magnitude = AD5933_CalculateImpedance(gainFactor,
 								  AD5933_FUNCTION_REPEAT_FREQ);
-	    printf("Recalculated Z = %f .. Original one had a value of: %f ... Error = %f%%\n",(1/(gainFactor*magnitude)),AD5933_CALIBRATION_IMPEDANCE,100*abs((AD5933_CALIBRATION_IMPEDANCE-(1/(gainFactor*magnitude))))/AD5933_CALIBRATION_IMPEDANCE);
+	    printf("Recalculated Z = %f .. \nOriginal one had a value of: %f ... \nError = %f%%\n",(1/(gainFactor*magnitude)),AD5933_CALIBRATION_IMPEDANCE,100*abs((AD5933_CALIBRATION_IMPEDANCE-(1/(gainFactor*magnitude))))/AD5933_CALIBRATION_IMPEDANCE);
         
         //printf("\nReplace calibration component with desired one for measurement and press any key");
 		// wait for user input
 		//scanf("%s",&string_tmp);
 
-		printf("Measurement Identification : ");
+		printf("\nMeasurement Identification : ");
 		scanf("%s",&string_tmp);
 		printf("\nIdMedicion : %s_%g_%s\n",&string_tmp,Calibration_Impedance,outFormatTime);
 
