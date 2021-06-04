@@ -278,7 +278,7 @@ int main (void)
 			CurrentFrequency = START_FREQ + INCREMENT_FREQ*freq_iter;
 			
 			// Print impedance
-			printf("Impedance read: %f ohms (phase: %f) (@ %lu Hz) (dif: %f)\n\r", impedance, phase-SystemPhase, CurrentFrequency,(impedance/Calibration_Impedance-1)*100);					  
+			printf("Impedance read: %f ohms (phase: %f) (@ %lu Hz) (dif: %f)\n\r", impedance, phase-SystemPhase, CurrentFrequency,(impedance/Calibration_Impedance-1)*100);	 				  
 			// printf("TEMPERATURE: %lu\n",TEMPERATURE);
 			fprintf(fout,"%f\t%f\t%lu\n",impedance,phase,CurrentFrequency);
 			fprintf(fout2,"%d\t%d\t%f\t%f\t%lu\n",RealPart,ImagPart,impedance, phase-SystemPhase,CurrentFrequency);
