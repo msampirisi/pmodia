@@ -1,2 +1,3 @@
 pmodia.test/*.txt
 pmodia.test/bin/*.*
+pmodia.test/src/test2.c
