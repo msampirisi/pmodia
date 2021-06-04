@@ -172,6 +172,7 @@ int main (void)
 				AD5933_CALIBRATION_IMPEDANCE = Calibration_Impedance; 
 			}
 		}
+		
 		// Define some variables
         CurrentFrequency = START_FREQ;
         double Z_MOD[NPOINTS] = {0};
