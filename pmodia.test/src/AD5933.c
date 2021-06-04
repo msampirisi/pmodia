@@ -280,13 +280,16 @@ float AD5933_GetTemperatureV2(void)
     {
         status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
 		statusM = (0x01 & status);
-		printf("status : %c %d - %c %d - %c %d \n", status, status, AD5933_STAT_TEMP_VALID, AD5933_STAT_TEMP_VALID, statusM, statusM);
+		printf(".");
+		//printf("status : %c %d - %c %d - %c %d \n", status, status, AD5933_STAT_TEMP_VALID, AD5933_STAT_TEMP_VALID, statusM, statusM);
 		//scanf("%s",&string_tmp2);
 		cuenta++;
 		if(cuenta>=15){
 			break;
 		}
     }
+
+	printf("\n");
     
     temperature = AD5933_GetRegisterValue(AD5933_REG_TEMP_DATA,2);
     if(temperature < 8192)
