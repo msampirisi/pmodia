@@ -402,6 +402,8 @@ int main(void)
 	printf("Temperature Final      : %f\n", temperatureFinal);
 	printf("Temperature Diferencia : %f (%f)\n", temperatureFinal - temperatureInicial, (temperatureFinal - temperatureInicial) / temperatureInicial);
 
+	printf("Debug: Actualizando archivo de control. Iniciando.\n");
+
 	// Archivo de control de ejecuciones
 	const char* fileNameControl = "pmodia.control.txt";
 	FILE *fctl;
@@ -409,6 +411,8 @@ int main(void)
 	fseek(fctl,0,SEEK_END);
 	if(ftell(fctl) == 0)
 	{
+		printf("Debug: Actualizando archivo de control. Creando Titulos.\n");
+
 		fprintf(fctl, "fecha\thora\t");
 		fprintf(fctl, "idMedicion\t");
 		fprintf(fctl, "tempIni\t");
@@ -436,6 +440,8 @@ int main(void)
 	phaseAvg = phaseTot / NPOINTS;
 
 	// genero un archivo de control de todas las corridas
+	printf("Debug: Actualizando archivo de control. Agregando Ejecucion.\n");
+
 	char outFormatTime2[40];
 	formatTime(outFormatTime2, 2);
 	fprintf(fctl, "%s\t", outFormatTime2);
@@ -460,6 +466,9 @@ int main(void)
 	fprintf(fctl, "\n");
 	fflush(fctl);
 	fclose(fctl); // archivo extendido
+
+	printf("Debug: Actualizando archivo de control. finalizando.\n");
+
 
 	return 0;
 
