@@ -3,3 +3,4 @@ pmodia.test/bin/*.*
 pmodia.test/src/test2.c
 pmodia.test/out.txt
 pmodia.test/bin/pmodia.test
+pmodia.test/.vscode
