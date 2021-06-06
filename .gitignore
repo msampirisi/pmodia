@@ -4,4 +4,5 @@ pmodia.test/src/test2.c
 pmodia.test/out.txt
 pmodia.test/bin/pmodia.test
 pmodia.test/.vscode
-pmodia.test/datos/pmodia.control.txt
+pmodia.test/datos
+pmodia.test/datos/*.txt
