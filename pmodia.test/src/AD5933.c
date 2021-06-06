@@ -821,13 +821,16 @@ double AD5933_CalculateImpedanceV3(double gainFactor, char freqFunction, signed 
 	*pRealData = RealPart;
 	*pImagData = ImagPart;
     
+	phase = AD5933_CalculatePhaseRAD(RealPart, ImagPart);
+
     // calculo la fase de acuerdo a la hoja de datos
     // real / imaginario / cuadrante
     // + / + : 1
     // + / - : 2
     // - / - : 3
     // - / + : 4
-    
+
+	/*
 	if(RealPart >= 0 && ImagPart >= 0){
         phase = atan(ImagPart/RealPart);
     }else if(RealPart < 0 && ImagPart >= 0){
@@ -839,7 +842,8 @@ double AD5933_CalculateImpedanceV3(double gainFactor, char freqFunction, signed 
     }else{
         phase = -100;
     }
-	
+	*/
+
 /*
     if(RealPart >= 0 && ImagPart >= 0){
         phase = atan(ImagPart/RealPart)*(180/M_PI);

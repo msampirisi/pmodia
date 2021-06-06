@@ -94,13 +94,13 @@ int main(void)
 	struct tm *timeinfo;
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
-	printf("\nCurrent time is : %s", ctime(&rawtime));
+	printf("\nCurrent time is : %s \t", ctime(&rawtime));
 	char outFormatTime[40];
 	formatTime(outFormatTime, 1);
 	printf("Format Time : %s \n", outFormatTime);
 
 	double temperatureInicial = 0;
-	printf("\nObteniendo Temperatura :\n");
+	printf("Obteniendo Temperatura.\n");
 	temperatureInicial = AD5933_GetTemperatureV2();
 	printf("Temperature %f", temperatureInicial);
 
@@ -331,6 +331,8 @@ int main(void)
 		phaseTot = phaseTot + phase;
 
 		Z_MOD[freq_iter] = impedance;
+		Z_IMAG[freq_iter] = ImagPart;
+		Z_REAL[freq_iter] = RealPart;
 		CurrentFrequency = START_FREQ + INCREMENT_FREQ * freq_iter;
 
 		// Print impedance
