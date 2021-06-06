@@ -413,7 +413,7 @@ int main(void)
 	{
 		printf("Debug: Actualizando archivo de control. Creando Titulos.\n");
 
-		fprintf(fctl, "fecha\thora\t");
+		fprintf(fctl, "fechahora\t");
 		fprintf(fctl, "idMedicion\t");
 		fprintf(fctl, "tempIni\t");
 		fprintf(fctl, "tempFin\t");
