@@ -277,7 +277,7 @@ int main(void)
 		// Crear todas las variables locales que se usaran sucesivamente
 
 		printf("\nMeasurement Identification (reemplazar el componente a medir): ");
-		scanf("%s\n", &string_tmp);
+		scanf("%s", &string_tmp);
 
 		sprintf(idMedicion, "%s", &string_tmp);
 		sprintf(idMedicionCtrl, "%s_%g_%s", idMedicion, AD5933_CALIBRATION_IMPEDANCE, outFormatTime);
@@ -418,6 +418,7 @@ int main(void)
 
 		printf("Debug: Actualizando archivo de control. finalizando.\n");
 
+		fflush(stdin);
 		printf("\nDesea realizar una nueva medicion? (Y/N)");
 		scanf("%c", &askYN);
 		printf("[ %c ]",askYN);
