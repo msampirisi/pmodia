@@ -27,12 +27,13 @@ $(BINDIR)/pmodia.test:
 
 $(BINDIR)/pmodia.test.2:
 	@echo "Compilando "$@" - Iniciando"
-	$(CXX) $(CXXFLAGS) $(CXXINCLUDE) -pipe $(LFLAGS) $(LLIB) -o $(BINDIR)/pmodia.test $(SRCDIR)/test2.c
+	$(CXX) $(CXXFLAGS) $(CXXINCLUDE) -pipe $(LFLAGS) $(LLIB) -o $(BINDIR)/pmodia.test.2 $(SRCDIR)/test2.c
 	@echo "Compilando "$@" - Finalizado"
 
 clean:
 	@echo "Limpiando archivos ejecutables/objeto"
 	rm -f $(BINDIR)/pmodia.test
+	rm -f $(BINDIR)/pmodia.test.2
 	@echo "Ejecutables removido."
 
 
