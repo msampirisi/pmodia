@@ -283,6 +283,7 @@ int main(void)
 		sprintf(idMedicionCtrl, "%s_%g_%s", idMedicion, AD5933_CALIBRATION_IMPEDANCE, outFormatTime);
 
 		printf("\nIdMedicion : %s (%s)\n", idMedicion, idMedicionCtrl);
+		sprintf(fileName2, "%s.txt", idMedicionCtrl);
 
 		printf("Debug: Obteniendo el registro de status.\n");
 
@@ -291,16 +292,19 @@ int main(void)
 		printf("Debug: Inicializando archivos de salida.\n");
 
 		// Initialize variables for output txt file and gnuplot
+		printf("Debug: Inicializando gnuplot.\n");
 		gnuplot = popen("gnuplot -persistent", "w");
+		printf("Debug: Inicializando fout.\n");
 		fout = fopen("out.txt", "w");
-
-		sprintf(fileName2, "%s.txt", idMedicionCtrl);
+		printf("Debug: Inicializando fout2.\n");
 		fout2 = fopen(fileName2, "w");
 
 		RealPart = 0;
 		ImagPart = 0;
 
+		printf("Debug: Inicializando gnuplot - plot - with lines.\n");
 		fprintf(gnuplot, "plot '-' with lines\n");
+		printf("Debug: fout2 - titulando.\n");
 		fprintf(fout2, "P.Real\tP.Imag\timpedance\tphase\tfrequency\n");
 
 		i = 0;
