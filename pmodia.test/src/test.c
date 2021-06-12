@@ -421,7 +421,7 @@ int main(void)
 		fflush(stdin);
 		printf("\nDesea realizar una nueva medicion? (Y/N)");
 		scanf("%s", &askYN);
-		printf("[ %s ]",askYN);
+		printf("[ %s ]",&askYN);
 		if (askYN != 'Y' && askYN != 'y')
 		{
 			break;
