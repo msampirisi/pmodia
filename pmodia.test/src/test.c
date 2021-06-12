@@ -420,6 +420,7 @@ int main(void)
 
 		printf("\nDesea realizar una nueva medicion? (Y/N)");
 		scanf("%c", &askYN);
+		printf("[ %c ]",askYN);
 		if (askYN != 'Y' && askYN != 'y')
 		{
 			break;
