@@ -248,8 +248,6 @@ int main(void)
 
 	do{
 
-		freq_iter = 1;
-
 		// Configure sweep
 		printf("\n Configuring the Sweep \n ");
 		AD5933_ConfigSweep(START_FREQ, INCREMENT_FREQ, NPOINTS);
@@ -299,13 +297,14 @@ int main(void)
 		printf("Debug: Inicializando fout2.\n");
 		fout2 = fopen(fileName2, "w");
 
-		RealPart = 0;
-		ImagPart = 0;
-
 		printf("Debug: Inicializando gnuplot - plot - with lines.\n");
 		fprintf(gnuplot, "plot '-' with lines\n");
 		printf("Debug: fout2 - titulando.\n");
 		fprintf(fout2, "P.Real\tP.Imag\timpedance\tphase\tfrequency\n");
+
+		RealPart = 0;
+		ImagPart = 0;
+		freq_iter = 1;
 
 		i = 0;
 		for (i = 0; i < NPOINTS; i++)
@@ -314,6 +313,7 @@ int main(void)
 			//TEMPERATURE = AD5933_GetTemperature();
 
 			// Calculate impedance between Vout and Vin
+			printf("AD5933_CalculateImpedanceV3");
 			magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
 			impedance = (1 / (gainFactor * magnitude));
 			phase = meansurePhase - systemPhase;
@@ -326,6 +326,7 @@ int main(void)
 			if (phaseMin > phase) phaseMin = phase;
 			phaseTot = phaseTot + phase;
 
+			printf("Z_MOD:");
 			Z_MOD[freq_iter] = impedance;
 			Z_IMAG[freq_iter] = ImagPart;
 			Z_REAL[freq_iter] = RealPart;
