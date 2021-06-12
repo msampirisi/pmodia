@@ -17,12 +17,17 @@ rm = rm -f
 #	${CXX} ${CXXFLAGS} -c ${SRCDIR}/ad5933.c
 #	@echo "Compilando "$<" finalizado."
 
-all: clean $(BINDIR)/pmodia.test
+all: clean $(BINDIR)/pmodia.test $(BINDIR)/pmodia.test.2
 	@echo "Proceso Finalizado."
 
 $(BINDIR)/pmodia.test:
 	@echo "Compilando "$@" - Iniciando"
 	$(CXX) $(CXXFLAGS) $(CXXINCLUDE) -pipe $(LFLAGS) $(LLIB) -o $(BINDIR)/pmodia.test $(SRCDIR)/test.c
+	@echo "Compilando "$@" - Finalizado"
+
+$(BINDIR)/pmodia.test.2:
+	@echo "Compilando "$@" - Iniciando"
+	$(CXX) $(CXXFLAGS) $(CXXINCLUDE) -pipe $(LFLAGS) $(LLIB) -o $(BINDIR)/pmodia.test $(SRCDIR)/test2.c
 	@echo "Compilando "$@" - Finalizado"
 
 clean:
