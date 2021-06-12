@@ -224,383 +224,207 @@ int main(void)
 	AD5933_SetRangeAndGain(currentRange, currentGain);
 	printf(" Done!\n");
 
-	// Configure sweep
-	printf("\n Configuring the Sweep \n ");
-	AD5933_ConfigSweep(START_FREQ, INCREMENT_FREQ, NPOINTS);
-	printf(" Done!\n");
-
-	// Start the sweep
-	AD5933_StartSweep();
-
-	// Calculate gain factor for calibration impedance
-	printf("\n Calculating Gain Factor \n");
-	/*
-		gainFactor = AD5933_CalculateGainFactor(AD5933_CALIBRATION_IMPEDANCE,
-									AD5933_FUNCTION_REPEAT_FREQ);
-		*/
-
-	gainFactor = AD5933_CalculateGainFactorAndSystemPhase(AD5933_CALIBRATION_IMPEDANCE,
-														  AD5933_FUNCTION_REPEAT_FREQ, &systemPhase);
-	printf("Done!...\n");
-	printf("---> Gain Factor  estimated to be: %g\n", gainFactor);
-	printf("---> System Phase estimated to be: %g\n", systemPhase);
-
-	// Make a single impedance measurement to make sure we have
-	// calibrated the board correctly
-	magnitude = AD5933_CalculateImpedance(gainFactor,
-										  AD5933_FUNCTION_REPEAT_FREQ);
-	printf("Recalculated Z = %f .. \nOriginal one had a value of: %f ... \nError = %f%%\n", (1 / (gainFactor * magnitude)), AD5933_CALIBRATION_IMPEDANCE, 100 * abs((AD5933_CALIBRATION_IMPEDANCE - (1 / (gainFactor * magnitude)))) / AD5933_CALIBRATION_IMPEDANCE);
-
-	//printf("\nReplace calibration component with desired one for measurement and press any key");
-	// wait for user input
-	//scanf("%s",&string_tmp);
-
-	printf("\nMeasurement Identification : ");
-	scanf("%s", &string_tmp);
+	// Proceso de toma de muestras
+	// crear todas las variables a utilizar
+	char askYN;
 
 	char idMedicion[100];
-	sprintf(idMedicion, "%s",&string_tmp);
 	char idMedicionCtrl[200];
-	sprintf(idMedicionCtrl, "%s_%g_%s", idMedicion, AD5933_CALIBRATION_IMPEDANCE, outFormatTime);
-
-	printf("\nIdMedicion : %s (%s)\n", idMedicion, idMedicionCtrl);
-
-	printf("Debug: Obteniendo el registro de status.\n");
-
-	status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
-
-	printf("Debug: Inicializando archivos de salida.\n");
-
-	// Initialize variables for output txt file and gnuplot
-	FILE *gnuplot = popen("gnuplot -persistent", "w");
-	FILE *fout = fopen("out.txt", "w");
-
 	char fileName2[204];
-	sprintf(fileName2, "%s.txt", idMedicionCtrl);
-	FILE *fout2 = fopen(fileName2, "w");
+
+	FILE *gnuplot;
+	FILE *fout;
+	FILE *fout2;
+	FILE *fctl;
 
 	signed short RealPart = 0;
 	signed short ImagPart = 0;
 
-	fprintf(gnuplot, "plot '-' with lines\n");
+	double temperatureFinal = 0;
+	const char *fileNameControl = "pmodia.control.txt";
+	char outFormatTime2[40];
 
-	// While sweep is not complete...
-	/*while (1)
-		{
-			magnitude = AD5933_CalculateImpedance(gainFactor,
-								  AD5933_FUNCTION_REPEAT_FREQ);
-			
-			Z_MOD[freq_iter] = (1/(gainFactor*magnitude));
-			CurrentFrequency = START_FREQ + INCREMENT_FREQ*freq_iter;
-			
-			printf("Impedance read: %f ohms (@ %lu Hz)\n\r", Z_MOD[freq_iter] , CurrentFrequency);
-			
-			
-			
-		}*/
+	int repetirProceso = 1;
 
-	fprintf(fout2, "P.Real\tP.Imag\timpedance\tphase\tfrequency\n");
+	do{
 
-	i = 0;
-	for (i = 0; i < NPOINTS; i++)
-	{
-		//TEMPERATURE
-		//TEMPERATURE = AD5933_GetTemperature();
+		freq_iter = 1;
 
-		// Calculate impedance between Vout and Vin
-		// Linea original
-		// magnitude = AD5933_CalculateImpedance(gainFactor, AD5933_FUNCTION_REPEAT_FREQ);
-		// Linea que obtiene tambien los datos parte Real/Imaginaria
-		magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
+		// Configure sweep
+		printf("\n Configuring the Sweep \n ");
+		AD5933_ConfigSweep(START_FREQ, INCREMENT_FREQ, NPOINTS);
+		printf(" Done!\n");
 
-		//Z_MOD[i] = magnitude;
-		//Z_MOD[freq_iter] = 1/magnitude;
-		impedance = (1 / (gainFactor * magnitude));
-		phase = meansurePhase - systemPhase;
+		// Start the sweep
+		AD5933_StartSweep();
 
-		if (impedanceMax < impedance)
-			impedanceMax = impedance;
-		if (impedanceMin > impedance)
-			impedanceMin = impedance;
-		impedanceTot = impedanceTot + impedance;
+		// Calculate gain factor for calibration impedance
+		printf("\n Calculating Gain Factor \n");
 
-		if (phaseMax < phase)
-			phaseMax = phase;
-		if (phaseMin > phase)
-			phaseMin = phase;
-		phaseTot = phaseTot + phase;
+		gainFactor = AD5933_CalculateGainFactorAndSystemPhase(AD5933_CALIBRATION_IMPEDANCE,
+															  AD5933_FUNCTION_REPEAT_FREQ, &systemPhase);
+		printf("Done!...\n");
+		printf("---> Gain Factor  estimated to be: %g\n", gainFactor);
+		printf("---> System Phase estimated to be: %g\n", systemPhase);
 
-		Z_MOD[freq_iter] = impedance;
-		Z_IMAG[freq_iter] = ImagPart;
-		Z_REAL[freq_iter] = RealPart;
-		CurrentFrequency = START_FREQ + INCREMENT_FREQ * freq_iter;
+		// Make a single impedance measurement to make sure we have
+		// calibrated the board correctly
+		magnitude = AD5933_CalculateImpedance(gainFactor,
+											  AD5933_FUNCTION_REPEAT_FREQ);
+		printf("Recalculated Z = %f .. \nOriginal one had a value of: %f ... \nError = %f%%\n", (1 / (gainFactor * magnitude)), AD5933_CALIBRATION_IMPEDANCE, 100 * abs((AD5933_CALIBRATION_IMPEDANCE - (1 / (gainFactor * magnitude)))) / AD5933_CALIBRATION_IMPEDANCE);
 
-		// Print impedance
-		printf("Impedance read: %f ohms (phase: %f) (@ %lu Hz) (dif: %f)\n\r", impedance, phase, CurrentFrequency, (impedance / Calibration_Impedance - 1) * 100);
-		// printf("TEMPERATURE: %lu\n",TEMPERATURE);
-		fprintf(fout, "%f\t%f\t%lu\n", impedance, phase, CurrentFrequency);
-		fprintf(fout2, "%d\t%d\t%f\t%f\t%lu\n", RealPart, ImagPart, impedance, phase, CurrentFrequency);
-		fprintf(gnuplot, "%lu %f\n", CurrentFrequency, impedance);
+		// Punto de Replicacion
+		// Crear todas las variables locales que se usaran sucesivamente
 
-		fflush(fout);
-		fflush(fout2);
-		fflush(gnuplot);
+		printf("\nMeasurement Identification (reemplazar el componente a medir): ");
+		scanf("%s", &string_tmp);
+
+		sprintf(idMedicion, "%s", &string_tmp);
+		sprintf(idMedicionCtrl, "%s_%g_%s", idMedicion, AD5933_CALIBRATION_IMPEDANCE, outFormatTime);
+
+		printf("\nIdMedicion : %s (%s)\n", idMedicion, idMedicionCtrl);
+
+		printf("Debug: Obteniendo el registro de status.\n");
 
 		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
-		freq_iter += 1;
-	}
-	/*while ((status & AD5933_STAT_SWEEP_DONE) == 0)
+
+		printf("Debug: Inicializando archivos de salida.\n");
+
+		// Initialize variables for output txt file and gnuplot
+		gnuplot = popen("gnuplot -persistent", "w");
+		fout = fopen("out.txt", "w");
+
+		sprintf(fileName2, "%s.txt", idMedicionCtrl);
+		fout2 = fopen(fileName2, "w");
+
+		RealPart = 0;
+		ImagPart = 0;
+
+		fprintf(gnuplot, "plot '-' with lines\n");
+		fprintf(fout2, "P.Real\tP.Imag\timpedance\tphase\tfrequency\n");
+
+		i = 0;
+		for (i = 0; i < NPOINTS; i++)
 		{
-			
 			//TEMPERATURE
-			TEMPERATURE = AD5933_GetTemperature();
-			
+			//TEMPERATURE = AD5933_GetTemperature();
+
 			// Calculate impedance between Vout and Vin
-			magnitude = AD5933_CalculateImpedance(gainFactor,
-								  AD5933_FUNCTION_REPEAT_FREQ);
-								  
-			Z_MOD[i] = magnitude;
-			//Z_MOD[freq_iter] = 1/magnitude;
-			//Z_MOD[freq_iter] = (1/(gainFactor*magnitude));
-			CurrentFrequency = START_FREQ + INCREMENT_FREQ*freq_iter;
-			
+			magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
+			impedance = (1 / (gainFactor * magnitude));
+			phase = meansurePhase - systemPhase;
+
+			if (impedanceMax < impedance) impedanceMax = impedance;
+			if (impedanceMin > impedance) impedanceMin = impedance;
+			impedanceTot = impedanceTot + impedance;
+
+			if (phaseMax < phase) phaseMax = phase;
+			if (phaseMin > phase) phaseMin = phase;
+			phaseTot = phaseTot + phase;
+
+			Z_MOD[freq_iter] = impedance;
+			Z_IMAG[freq_iter] = ImagPart;
+			Z_REAL[freq_iter] = RealPart;
+			CurrentFrequency = START_FREQ + INCREMENT_FREQ * freq_iter;
+
 			// Print impedance
-			printf("Impedance read: %f ohms (@ %lu Hz)\n\r", magnitude, CurrentFrequency);					  
-			printf("TEMPERATURE: %lu\n",TEMPERATURE);
-			fprintf(fout,"%f\t%lu\n",magnitude,CurrentFrequency);
-			
-			fprintf(gnuplot, "%lu %f\n",CurrentFrequency,magnitude);
-			
-			
-			status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
+			printf("Impedance read: %f ohms (phase: %f) (@ %lu Hz) (dif: %f)\n\r", impedance, phase, CurrentFrequency, (impedance / Calibration_Impedance - 1) * 100);
+			// printf("TEMPERATURE: %lu\n",TEMPERATURE);
+			fprintf(fout, "%f\t%f\t%lu\n", impedance, phase, CurrentFrequency);
+			fprintf(fout2, "%d\t%d\t%f\t%f\t%lu\n", RealPart, ImagPart, impedance, phase, CurrentFrequency);
+			fprintf(gnuplot, "%lu %f\n", CurrentFrequency, impedance);
+
+			fflush(fout);
+			fflush(fout2);
+			fflush(gnuplot);
+
+			status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
 			freq_iter += 1;
-			i += 1;
-			
-			
-			//getchar();
-			
-			
-		   
-	   }*/
+		}
 
-	fprintf(gnuplot, "e\n");
-	fflush(gnuplot);
+		fprintf(gnuplot, "e\n");
+		fflush(gnuplot);
 
-	fclose(fout);
-	fclose(fout2); // archivo extendido
+		fclose(fout);
+		fclose(fout2); // archivo extendido
 
-	// Write array to txt file
-	//FILE* fout = fopen("out.txt","w");
-	//for (i=0; i<NPOINTS;i++)
-	//{
-	//fprintf(fout,"%f\n",Z[i]);
-	//}
-	//fclose(fout);
+		printf("\n Obteniendo Temperatura : \n");
+		temperatureFinal = AD5933_GetTemperatureV2();
+		printf("Temperature Inicial    : %f\n", temperatureInicial);
+		printf("Temperature Final      : %f\n", temperatureFinal);
+		printf("Temperature Diferencia : %f (%f)\n", temperatureFinal - temperatureInicial, (temperatureFinal - temperatureInicial) / temperatureInicial);
 
-	double temperatureFinal = 0;
-	printf("\n Obteniendo Temperatura : \n");
-	temperatureFinal = AD5933_GetTemperatureV2();
-	printf("Temperature Inicial    : %f\n", temperatureInicial);
-	printf("Temperature Final      : %f\n", temperatureFinal);
-	printf("Temperature Diferencia : %f (%f)\n", temperatureFinal - temperatureInicial, (temperatureFinal - temperatureInicial) / temperatureInicial);
+		printf("Debug: Actualizando archivo de control. Iniciando.\n");
 
-	printf("Debug: Actualizando archivo de control. Iniciando.\n");
+		// Archivo de control de ejecuciones
+		fctl = fopen(fileNameControl, "a");
+		fseek(fctl, 0, SEEK_END);
+		if (ftell(fctl) == 0)
+		{
+			printf("Debug: Actualizando archivo de control. Creando Titulos.\n");
 
-	// Archivo de control de ejecuciones
-	const char* fileNameControl = "pmodia.control.txt";
-	FILE *fctl;
-	fctl = fopen(fileNameControl, "a");
-	fseek(fctl,0,SEEK_END);
-	if(ftell(fctl) == 0)
-	{
-		printf("Debug: Actualizando archivo de control. Creando Titulos.\n");
+			fprintf(fctl, "fechahora\t");
+			fprintf(fctl, "idMedicion\t");
+			fprintf(fctl, "tempIni\t");
+			fprintf(fctl, "tempFin\t");
+			fprintf(fctl, "Range\t");
+			fprintf(fctl, "Gain\t");
+			fprintf(fctl, "FreqIni\t");
+			fprintf(fctl, "FreqInc\t");
+			fprintf(fctl, "FreqPoi\t");
+			fprintf(fctl, "calibImpedance\t");
+			fprintf(fctl, "gainFactor\t");
+			fprintf(fctl, "systemPhase\t");
+			fprintf(fctl, "impedanceMax\t");
+			fprintf(fctl, "impedanceAvg\t");
+			fprintf(fctl, "impedanceMin\t");
+			fprintf(fctl, "phaseMax\t");
+			fprintf(fctl, "phaseAvg\t");
+			fprintf(fctl, "phaseMin\t");
+			fprintf(fctl, "dataFile\t");
+			fprintf(fctl, "\n");
+		}
 
-		fprintf(fctl, "fechahora\t");
-		fprintf(fctl, "idMedicion\t");
-		fprintf(fctl, "tempIni\t");
-		fprintf(fctl, "tempFin\t");
-		fprintf(fctl, "Range\t");
-		fprintf(fctl, "Gain\t");
-		fprintf(fctl, "FreqIni\t");
-		fprintf(fctl, "FreqInc\t");
-		fprintf(fctl, "FreqPoi\t");
-		fprintf(fctl, "calibImpedance\t");
-		fprintf(fctl, "gainFactor\t");
-		fprintf(fctl, "systemPhase\t");
-		fprintf(fctl, "impedanceMax\t");
-		fprintf(fctl, "impedanceAvg\t");
-		fprintf(fctl, "impedanceMin\t");
-		fprintf(fctl, "phaseMax\t");
-		fprintf(fctl, "phaseAvg\t");
-		fprintf(fctl, "phaseMin\t");
-		fprintf(fctl, "dataFile\t");
+		// calculo de promedios
+		impedanceAvg = impedanceTot / NPOINTS;
+		phaseAvg = phaseTot / NPOINTS;
+
+		// genero un archivo de control de todas las corridas
+		printf("Debug: Actualizando archivo de control. Agregando Ejecucion.\n");
+
+		formatTime(outFormatTime2, 2);
+		fprintf(fctl, "%s\t", outFormatTime2);
+		fprintf(fctl, "%s\t", idMedicion);
+		fprintf(fctl, "%f\t", temperatureInicial);
+		fprintf(fctl, "%f\t", temperatureFinal);
+		fprintf(fctl, "%hu\t", currentRange);
+		fprintf(fctl, "%hu\t", currentGain);
+		fprintf(fctl, "%lu\t", START_FREQ);
+		fprintf(fctl, "%lu\t", INCREMENT_FREQ);
+		fprintf(fctl, "%hu\t", NPOINTS);
+		fprintf(fctl, "%f\t", AD5933_CALIBRATION_IMPEDANCE);
+		fprintf(fctl, "%g\t", gainFactor);
+		fprintf(fctl, "%g\t", systemPhase);
+		fprintf(fctl, "%f\t", impedanceMax);
+		fprintf(fctl, "%f\t", impedanceAvg);
+		fprintf(fctl, "%f\t", impedanceMin);
+		fprintf(fctl, "%f\t", phaseMax);
+		fprintf(fctl, "%f\t", phaseAvg);
+		fprintf(fctl, "%f\t", phaseMin);
+		fprintf(fctl, "%s\t", fileName2);
 		fprintf(fctl, "\n");
-	}
+		fflush(fctl);
+		fclose(fctl); // archivo extendido
 
-	// calculo de promedios
-	impedanceAvg = impedanceTot / NPOINTS;
-	phaseAvg = phaseTot / NPOINTS;
+		printf("Debug: Actualizando archivo de control. finalizando.\n");
 
-	// genero un archivo de control de todas las corridas
-	printf("Debug: Actualizando archivo de control. Agregando Ejecucion.\n");
-
-	char outFormatTime2[40];
-	formatTime(outFormatTime2, 2);
-	fprintf(fctl, "%s\t", outFormatTime2);
-	fprintf(fctl, "%s\t", idMedicion);
-	fprintf(fctl, "%f\t", temperatureInicial);
-	fprintf(fctl, "%f\t", temperatureFinal);
-	fprintf(fctl, "%hu\t", currentRange);
-	fprintf(fctl, "%hu\t", currentGain);
-	fprintf(fctl, "%lu\t", START_FREQ);
-	fprintf(fctl, "%lu\t", INCREMENT_FREQ);
-	fprintf(fctl, "%hu\t", NPOINTS);
-	fprintf(fctl, "%f\t", AD5933_CALIBRATION_IMPEDANCE);
-	fprintf(fctl, "%g\t", gainFactor);
-	fprintf(fctl, "%g\t", systemPhase);
-	fprintf(fctl, "%f\t", impedanceMax);
-	fprintf(fctl, "%f\t", impedanceAvg);
-	fprintf(fctl, "%f\t", impedanceMin);
-	fprintf(fctl, "%f\t", phaseMax);
-	fprintf(fctl, "%f\t", phaseAvg);
-	fprintf(fctl, "%f\t", phaseMin);
-	fprintf(fctl, "%s\t", fileName2);
-	fprintf(fctl, "\n");
-	fflush(fctl);
-	fclose(fctl); // archivo extendido
-
-	printf("Debug: Actualizando archivo de control. finalizando.\n");
-
-
-	return 0;
-
-	////Demo Program based on https://github.com/analogdevicesinc/no-OS/blob/master/Pmods/PmodIA/AD5933.c
-
-	//unsigned long  impedanceKohms  = 0;
-	//unsigned long  impedanceOhms   = 0;
-	////float          impedance       = 0.0f;
-
-	//unsigned long START_FREQ = 3000; // in Hertz (unsigned long has 32 bits, from which we will only need 24)
-	//unsigned long INCREMENT_FREQ = 1500; // in Hertz
-	//unsigned short NPOINTS = 1000;
-	//unsigned long f = START_FREQ;
-	//float Z[NPOINTS];
-
-	////// Set Range and Gain
-	//currentRange = AD5933_RANGE_2000mVpp;
-	//currentGain = AD5933_GAIN_X1;
-	//printf("Setting Range to %d and Gain to %d\n",currentRange,currentGain);
-	//AD5933_SetRangeAndGain(currentRange,currentGain);
-
-	//// Get temperature data (just to know how to get it)
-	//TEMPERATURE = AD5933_GetTemperature();
-	//printf(" Temperature: %lu\n",TEMPERATURE);
-
-	//// Configure sweep
-	//AD5933_ConfigSweep(START_FREQ, INCREMENT_FREQ, NPOINTS);
-
-	//// Start the sweep
-	//AD5933_StartSweep();
-
-	//// Calculate gain factor for an impedance of 98kohms
-	//gainFactor = AD5933_CalculateGainFactor(AD5933_CALIBRATION_IMPEDANCE,
-	//AD5933_FUNCTION_REPEAT_FREQ);
-
-	//// Change the resistor used for calibration with the one you wish to measure
-	//printf("Gain Factor: %f\n",gainFactor);
-	//printf("Replace calibration component with desired one for measurement and press any key\n\r");
-	//// wait for user input
-	//getchar();
-
-	//status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
-
-	//FILE* fout = fopen("out.txt","w");
-	//FILE *gnuplot = popen("gnuplot -persistent", "w");
-	//fprintf(gnuplot, "plot '-' with lines\n");
-	//while ((status & AD5933_STAT_SWEEP_DONE) == 0)
-	//{
-
-	//// Calculate impedance between Vout and Vin
-	//impedance = AD5933_CalculateImpedance(gainFactor,
-	//AD5933_FUNCTION_INC_FREQ);
-
-	//impedanceOhms = (unsigned long)impedance;
-
-	//// Get real and imaginary reg parts
-	//signed short RealPart = 0;
-	//signed short ImagPart = 0;
-	//unsigned char byte          = 0;
-	//int tmp = 0;
-
-	//unsigned char registerAddress = AD5933_REG_REAL_DATA;
-	//for(byte = 0;byte < 2;byte ++)
-	//{
-	//// Read byte from specified registerAddress memory place
-	//tmp = wiringPiI2CReadReg8(i2cdevice,registerAddress);
-	//printf("\t\tReading from Register Address: 0x%02x...0x%02x\n",registerAddress,tmp);
-	//// Add this temporal value to our registerValue (remembering that
-	//// we are reading bytes that have location value, which means that
-	//// each measure we have we not only have to add it to the previous
-	//// register value but we also but do a bitwise shift (<< 8) by 1 byte
-	//RealPart = RealPart << 8;
-	//RealPart += tmp;
-	//// Update value from registerAddress to read next memory position byte
-	//registerAddress = registerAddress + 1;
-	//}
-
-	//printf("Read Real: %hi\n",RealPart);
-
-	//registerAddress = AD5933_REG_IMAG_DATA;
-	//for(byte = 0;byte < 2;byte ++)
-	//{
-	//// Read byte from specified registerAddress memory place
-	//tmp = wiringPiI2CReadReg8(i2cdevice,registerAddress);
-	//printf("\t\tReading from Register Address: 0x%02x...0x%02x\n",registerAddress,tmp);
-	//// Add this temporal value to our registerValue (remembering that
-	//// we are reading bytes that have location value, which means that
-	//// each measure we have we not only have to add it to the previous
-	//// register value but we also but do a bitwise shift (<< 8) by 1 byte
-	//ImagPart = ImagPart << 8;
-	//ImagPart += tmp;
-	//// Update value from registerAddress to read next memory position byte
-	//registerAddress = registerAddress + 1;
-	//}
-
-	//printf("Read Imag: %hi\n",ImagPart);
-
-	////float magnitude = 0;
-
-	//magnitude = sqrtf((RealPart * RealPart) + (ImagPart * ImagPart));
-	//printf("Magnitude: %f\n",magnitude);
-
-	////Z[freq_iter] = 1/(gainFactor*magnitude);
-	//Z[freq_iter] = magnitude;
-	//f = START_FREQ + INCREMENT_FREQ*freq_iter;
-
-	//// Print impedance
-	//printf("Impedance read: %f kohms (@ %lu Hz)\n\r", Z[freq_iter], f);
-	//fprintf(fout,"%f\t%lu\n",Z[freq_iter],f);
-
-	//fprintf(gnuplot, "%lu %f\n",f,Z[freq_iter]);
-
-	//status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
-	//freq_iter += 1;
-
-	////getchar();
-
-	//}
-
-	//fclose(fout);
-	//fprintf(gnuplot, "e\n");
-	//fflush(gnuplot);
-
-	// Write array to txt file
-	//FILE* fout = fopen("out.txt","w");
-	//for (i=0; i<NPOINTS;i++)
-	//{
-	//fprintf(fout,"%f\n",Z[i]);
-	//}
-	//fclose(fout);
+		printf("\nDesea realizar una nueva medicion? (Y/N)");
+		scanf("%c", &askYN);
+		if (askYN != 'Y' && askYN != 'y')
+		{
+			break;
+		}
+	} while (1 == 1);
 
 	return 0;
 }
