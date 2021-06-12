@@ -218,11 +218,6 @@ int main(void)
 	double phaseTot = 0;
 	int WINDOW = 5;
 
-	// ******************** DEMO STARTS ****************************
-	// Set the Range and Gain
-	printf("\n Setting Range to %d and Gain to %d     \n ", currentRange, currentGain);
-	AD5933_SetRangeAndGain(currentRange, currentGain);
-	printf(" Done!\n");
 
 	// Proceso de toma de muestras
 	// crear todas las variables a utilizar
@@ -247,6 +242,13 @@ int main(void)
 	int repetirProceso = 1;
 
 	do{
+		// Preparo el equipo para una lectura.
+		AD5933_Reset();
+
+	// Set the Range and Gain
+	printf("\n Setting Range to %d and Gain to %d     \n ", currentRange, currentGain);
+	AD5933_SetRangeAndGain(currentRange, currentGain);
+	printf(" Done!\n");
 
 		// Configure sweep
 		printf("\n Configuring the Sweep \n ");
@@ -313,7 +315,7 @@ int main(void)
 			//TEMPERATURE = AD5933_GetTemperature();
 
 			// Calculate impedance between Vout and Vin
-			printf("AD5933_CalculateImpedanceV3");
+			// printf("AD5933_CalculateImpedanceV3");
 			magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
 			impedance = (1 / (gainFactor * magnitude));
 			phase = meansurePhase - systemPhase;
