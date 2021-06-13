@@ -1,6 +1,12 @@
 import smbus
 import time
 
+#import sys
+#print(sys.version_info)
+#if sys.version_info[0] < 3:
+#    raise Exception("Must be using Python 3")
+
+
 i2c_ch = 1
 i2c_address = 0x0d
 nroRepeticiones = 10
