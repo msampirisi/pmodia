@@ -1,4 +1,4 @@
-/***************************************************************************//**
+/***************************************************************************/ /**
  *   @file   AD5933.c
  *   @brief  Implementation of AD5933 Driver.
  *   @author DBogdan (dragos.bogdan@analog.com)
@@ -49,21 +49,21 @@
 /******************************************************************************/
 /************************** Constants Definitions *****************************/
 /******************************************************************************/
-const long POW_2_27 = 134217728ul;      // 2 to the power of 27
+const long POW_2_27 = 134217728ul; // 2 to the power of 27
 
 /******************************************************************************/
 /************************ Variables Definitions *******************************/
 /******************************************************************************/
-unsigned long currentSysClk      = AD5933_INTERNAL_SYS_CLK;
+unsigned long currentSysClk = AD5933_INTERNAL_SYS_CLK;
 unsigned char currentClockSource = AD5933_CONTROL_INT_SYSCLK;
-unsigned char currentGain        = AD5933_GAIN_X1;
-unsigned char currentRange       = AD5933_RANGE_2000mVpp;
+unsigned char currentGain = AD5933_GAIN_X1;
+unsigned char currentRange = AD5933_RANGE_2000mVpp;
 
 /******************************************************************************/
 /************************ Functions Definitions *******************************/
 /******************************************************************************/
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Initializes the communication peripheral.
  *
  * @return status - The result of the initialization procedure.
@@ -72,13 +72,13 @@ unsigned char currentRange       = AD5933_RANGE_2000mVpp;
 *******************************************************************************/
 char AD5933_Init(void)
 {
-    unsigned char status = -1;
-    
-    //status = I2C_Init(100000);
-    return 1;
+	unsigned char status = -1;
+
+	//status = I2C_Init(100000);
+	return 1;
 }
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Writes data into a register.
  *
  * @param registerAddress - Address of the register.
@@ -88,27 +88,27 @@ char AD5933_Init(void)
  * @return None.
 *******************************************************************************/
 void AD5933_SetRegisterValue(unsigned char registerAddress,
-                             unsigned long registerValue,
-                             unsigned char bytesNumber)
+							 unsigned long registerValue,
+							 unsigned char bytesNumber)
 {
-    unsigned char byte          = 0;
-    unsigned char writeData[2]  = {0, 0};
+	unsigned char byte = 0;
+	unsigned char writeData[2] = {0, 0};
 	int status;
 
-    for(byte = 0;byte < bytesNumber; byte++)
-    {
-        writeData[0] = registerAddress + bytesNumber - byte - 1;
-        writeData[1] = (unsigned char)((registerValue >> (byte * 8)) & 0xFF);
-        wiringPiI2CWriteReg8(i2cdevice,writeData[0],writeData[1]);
-        //printf("\t\tWriting: 0x%x into 0x%x\n",writeData[1],writeData[0]);
-        //printf("Status = %d\n",status);
-        //printf("writeData[0]=0x%x\n",writeData[0]);
-        //printf("writeData[1]=0x%x\n",writeData[1]);
-        //I2C_Write(AD5933_ADDRESS, writeData, 2, 1);
-    }
+	for (byte = 0; byte < bytesNumber; byte++)
+	{
+		writeData[0] = registerAddress + bytesNumber - byte - 1;
+		writeData[1] = (unsigned char)((registerValue >> (byte * 8)) & 0xFF);
+		wiringPiI2CWriteReg8(i2cdevice, writeData[0], writeData[1]);
+		//printf("\t\tWriting: 0x%x into 0x%x\n",writeData[1],writeData[0]);
+		//printf("Status = %d\n",status);
+		//printf("writeData[0]=0x%x\n",writeData[0]);
+		//printf("writeData[1]=0x%x\n",writeData[1]);
+		//I2C_Write(AD5933_ADDRESS, writeData, 2, 1);
+	}
 }
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Reads the value of a register.
  *
  * @param registerAddress - Address of the register.
@@ -117,45 +117,45 @@ void AD5933_SetRegisterValue(unsigned char registerAddress,
  * @return registerValue  - Value of the register.
 *******************************************************************************/
 unsigned long AD5933_GetRegisterValue(unsigned char registerAddress,
-                                      unsigned char bytesNumber)
+									  unsigned char bytesNumber)
 {
-    unsigned long registerValue = 0;
-    unsigned char byte          = 0;
-    unsigned char writeData[2]  = {0, 0};
-    unsigned char readData[2]   = {0, 0};
-    int tmp = 0;
-    
-    for(byte = 0;byte < bytesNumber;byte ++)
-    {
-        // Read byte from specified registerAddress memory place
-		tmp = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+	unsigned long registerValue = 0;
+	unsigned char byte = 0;
+	unsigned char writeData[2] = {0, 0};
+	unsigned char readData[2] = {0, 0};
+	int tmp = 0;
+
+	for (byte = 0; byte < bytesNumber; byte++)
+	{
+		// Read byte from specified registerAddress memory place
+		tmp = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 		//printf("\t\tReading from Register Address: 0x%02x...0x%02x\n",registerAddress,tmp);
 		// Add this temporal value to our registerValue (remembering that
 		// we are reading bytes that have location value, which means that
 		// each measure we have we not only have to add it to the previous
 		// register value but we also but do a bitwise shift (<< 8) by 1 byte
 		registerValue = registerValue << 8;
-        registerValue += tmp;
-        // Update value from registerAddress to read next memory position byte
-        registerAddress = registerAddress + 1;
-    }
-    
-    return registerValue;
+		registerValue += tmp;
+		// Update value from registerAddress to read next memory position byte
+		registerAddress = registerAddress + 1;
+	}
+
+	return registerValue;
 }
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Resets the device.
  *
  * @return None.
 *******************************************************************************/
 void AD5933_Reset(void)
 {
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB, 
-                            AD5933_CONTROL_RESET | currentClockSource,
-                            1);
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB,
+							AD5933_CONTROL_RESET | currentClockSource,
+							1);
 }
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Selects the source of the system clock.
  *
  * @param clkSource  - Selects the source of the system clock.
@@ -167,20 +167,19 @@ void AD5933_Reset(void)
 *******************************************************************************/
 void AD5933_SetSystemClk(char clkSource, unsigned long extClkFreq)
 {
-    currentClockSource = clkSource;
-    if(clkSource == AD5933_CONTROL_EXT_SYSCLK)
-    {
-        currentSysClk = extClkFreq;                 // External clock frequency
-    }
-    else
-    {
-        currentSysClk = AD5933_INTERNAL_SYS_CLK;    // 16 MHz
-    }
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB, currentClockSource, 1);
+	currentClockSource = clkSource;
+	if (clkSource == AD5933_CONTROL_EXT_SYSCLK)
+	{
+		currentSysClk = extClkFreq; // External clock frequency
+	}
+	else
+	{
+		currentSysClk = AD5933_INTERNAL_SYS_CLK; // 16 MHz
+	}
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB, currentClockSource, 1);
 }
 
-
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Selects the range and gain of the device.
  *  
  * @param range - Range option.
@@ -197,17 +196,17 @@ void AD5933_SetSystemClk(char clkSource, unsigned long extClkFreq)
 *******************************************************************************/
 void AD5933_SetRangeAndGain(char range, char gain)
 {
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-                         AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_NOP) |
-                         AD5933_CONTROL_RANGE(range) | 
-                         AD5933_CONTROL_PGA_GAIN(gain),
-                         1);
-    /* Store the last settings made to range and gain. */
-    currentRange = range;
-    currentGain = gain;
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
+							AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_NOP) |
+								AD5933_CONTROL_RANGE(range) |
+								AD5933_CONTROL_PGA_GAIN(gain),
+							1);
+	/* Store the last settings made to range and gain. */
+	currentRange = range;
+	currentGain = gain;
 }
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Reads the temperature from the part and returns the data in
  *        degrees Celsius.
  *
@@ -215,35 +214,35 @@ void AD5933_SetRangeAndGain(char range, char gain)
 *******************************************************************************/
 float AD5933_GetTemperature(void)
 {
-    float         temperature = 0;
-    unsigned char status      = 0;
+	float temperature = 0;
+	unsigned char status = 0;
 
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-                         AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_MEASURE_TEMP) |
-                         AD5933_CONTROL_RANGE(currentRange) | 
-                         AD5933_CONTROL_PGA_GAIN(currentGain),
-                         1);
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
+							AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_MEASURE_TEMP) |
+								AD5933_CONTROL_RANGE(currentRange) |
+								AD5933_CONTROL_PGA_GAIN(currentGain),
+							1);
 
-    while((status & AD5933_STAT_TEMP_VALID) == 0)
-    {
-        status  = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
+	while ((status & AD5933_STAT_TEMP_VALID) == 0)
+	{
+		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
 	}
-    
-    temperature = AD5933_GetRegisterValue(AD5933_REG_TEMP_DATA,2);
-    if(temperature < 8192)
-    {
-        temperature /= 32;
-    }
-    else
-    {
-        temperature -= 16384;
-        temperature /= 32;
-    }
-    
-    return temperature;
+
+	temperature = AD5933_GetRegisterValue(AD5933_REG_TEMP_DATA, 2);
+	if (temperature < 8192)
+	{
+		temperature /= 32;
+	}
+	else
+	{
+		temperature -= 16384;
+		temperature /= 32;
+	}
+
+	return temperature;
 }
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Reads the temperature from the part and returns the data in
  *        degrees Celsius.
  *
@@ -251,9 +250,9 @@ float AD5933_GetTemperature(void)
 *******************************************************************************/
 float AD5933_GetTemperatureV2(void)
 {
-    float         temperature = 0;
-    unsigned char status      = 0;
-    unsigned char statusM     = 0;
+	float temperature = 0;
+	unsigned char status = 0;
+	unsigned char statusM = 0;
 	unsigned long statusControl = 0;
 	int cuenta = 0;
 	char string_tmp2;
@@ -265,42 +264,43 @@ float AD5933_GetTemperatureV2(void)
                          AD5933_CONTROL_PGA_GAIN(currentGain),
                          1);
 						 */
-	statusControl = AD5933_GetRegisterValue(AD5933_REG_CONTROL_HB,2);
+	statusControl = AD5933_GetRegisterValue(AD5933_REG_CONTROL_HB, 2);
 	//printf("Before statusControl : %d - %x \n",statusControl, statusControl);
 	//scanf("%s",&string_tmp2);
 
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,0x91,1);
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB,0x00,1);
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB, 0x91, 1);
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB, 0x00, 1);
 
-	statusControl = AD5933_GetRegisterValue(AD5933_REG_CONTROL_HB,2);
+	statusControl = AD5933_GetRegisterValue(AD5933_REG_CONTROL_HB, 2);
 	//printf("After statusControl : %d - %x \n",statusControl, statusControl);
 	//scanf("%s",&string_tmp2);
 
-    while((status & AD5933_STAT_TEMP_VALID) == 0)
-    {
-        status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
+	while ((status & AD5933_STAT_TEMP_VALID) == 0)
+	{
+		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
 		statusM = (0x01 & status);
 		printf(".");
 		//printf("status : %c %d - %c %d - %c %d \n", status, status, AD5933_STAT_TEMP_VALID, AD5933_STAT_TEMP_VALID, statusM, statusM);
 		//scanf("%s",&string_tmp2);
 		cuenta++;
-		if(cuenta>=15){
+		if (cuenta >= 15)
+		{
 			break;
 		}
-    }
+	}
 
 	printf("\n");
-    
-    temperature = AD5933_GetRegisterValue(AD5933_REG_TEMP_DATA,2);
-    if(temperature < 8192)
-    {
-        temperature /= 32;
-    }
-    else
-    {
-        temperature -= 16384;
-        temperature /= 32;
-    }
+
+	temperature = AD5933_GetRegisterValue(AD5933_REG_TEMP_DATA, 2);
+	if (temperature < 8192)
+	{
+		temperature /= 32;
+	}
+	else
+	{
+		temperature -= 16384;
+		temperature /= 32;
+	}
 
 	/*
 	printf("Debug");
@@ -318,13 +318,13 @@ float AD5933_GetTemperatureV2(void)
 	printf("0x96\t%x\n",AD5933_GetRegisterValue(0x96,2));
 	*/
 
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,0x00,1);
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB,0x00,1);
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB, 0x00, 1);
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB, 0x00, 1);
 
-    return temperature;
+	return temperature;
 }
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Configures the sweep parameters: Start frequency, Frequency increment
  *        and Number of increments.
  *
@@ -334,86 +334,85 @@ float AD5933_GetTemperatureV2(void)
  *
  * @return None.
 *******************************************************************************/
-void AD5933_ConfigSweep(unsigned long  startFreq,
-                        unsigned long  incFreq,
-                        unsigned short incNum)
+void AD5933_ConfigSweep(unsigned long startFreq,
+						unsigned long incFreq,
+						unsigned short incNum)
 {
-    unsigned long  startFreqReg = 0;
-    unsigned long  incFreqReg   = 0;
-    unsigned short incNumReg    = 0;
-    
-    // Ensure that incNum is a valid data. 
-    if(incNum > AD5933_MAX_INC_NUM)
-    {
-        incNumReg = AD5933_MAX_INC_NUM;
-    }
-    else
-    {
-        incNumReg = incNum;
-    }
-    
-    // Convert users start frequency to binary code. //
-    startFreqReg = (unsigned long)((double)startFreq * 4 / currentSysClk *
-                                   POW_2_27);
-   
-    // Convert users increment frequency to binary code. //
-    incFreqReg = (unsigned long)((double)incFreq * 4 / currentSysClk * 
-                                 POW_2_27);
-    
-    
-    printf("Configuring Sweeping Parameters:\n\tStarting Freq = %lu (0x%06x)\n",startFreq,startFreqReg);
-    printf("\tIncrement Frequency = %lu (0x%06x)\n",incFreq,incFreqReg);
-    printf("\tNumber of Points = %d (0x%04x)\n",incNum,incNum);
-    
-    // Configure the device with the sweep parameters. //
-    AD5933_SetRegisterValue(AD5933_REG_FREQ_START,
-                            startFreqReg,
-                            3);
-    AD5933_SetRegisterValue(AD5933_REG_FREQ_INC,
-                            incFreqReg,
-                            3);
-    AD5933_SetRegisterValue(AD5933_REG_INC_NUM,
-                            incNumReg,
-                            2);
+	unsigned long startFreqReg = 0;
+	unsigned long incFreqReg = 0;
+	unsigned short incNumReg = 0;
+
+	// Ensure that incNum is a valid data.
+	if (incNum > AD5933_MAX_INC_NUM)
+	{
+		incNumReg = AD5933_MAX_INC_NUM;
+	}
+	else
+	{
+		incNumReg = incNum;
+	}
+
+	// Convert users start frequency to binary code. //
+	startFreqReg = (unsigned long)((double)startFreq * 4 / currentSysClk *
+								   POW_2_27);
+
+	// Convert users increment frequency to binary code. //
+	incFreqReg = (unsigned long)((double)incFreq * 4 / currentSysClk *
+								 POW_2_27);
+
+	printf("Configuring Sweeping Parameters:\n\tStarting Freq = %lu (0x%06x)\n", startFreq, startFreqReg);
+	printf("\tIncrement Frequency = %lu (0x%06x)\n", incFreq, incFreqReg);
+	printf("\tNumber of Points = %d (0x%04x)\n", incNum, incNum);
+
+	// Configure the device with the sweep parameters. //
+	AD5933_SetRegisterValue(AD5933_REG_FREQ_START,
+							startFreqReg,
+							3);
+	AD5933_SetRegisterValue(AD5933_REG_FREQ_INC,
+							incFreqReg,
+							3);
+	AD5933_SetRegisterValue(AD5933_REG_INC_NUM,
+							incNumReg,
+							2);
 }
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Starts the sweep operation.
  *
  * @return None.
 *******************************************************************************/
 void AD5933_StartSweep(void)
 {
-    unsigned char status = 0;
-    
-    // put AD5933 in standby mode (required, see datasheet)
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-                            AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_STANDBY) |
-                            AD5933_CONTROL_RANGE(currentRange) | 
-                            AD5933_CONTROL_PGA_GAIN(currentGain),
-                            1);
+	unsigned char status = 0;
+
+	// put AD5933 in standby mode (required, see datasheet)
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
+							AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_STANDBY) |
+								AD5933_CONTROL_RANGE(currentRange) |
+								AD5933_CONTROL_PGA_GAIN(currentGain),
+							1);
 	// Reset device
-    AD5933_Reset();
-    
-    // Initialize sweep with start frequency (this does not start the sweep,
-    // just initializes some parameters)
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-                       AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_INIT_START_FREQ)|
-                       AD5933_CONTROL_RANGE(currentRange) | 
-                       AD5933_CONTROL_PGA_GAIN(currentGain),
-                       1);
-    
-    // Start the Sweep
-    AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-                       AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_START_SWEEP) | 
-                       AD5933_CONTROL_RANGE(currentRange) | 
-                       AD5933_CONTROL_PGA_GAIN(currentGain),
-                       1);
-    status = 0;
-    while((status & AD5933_STAT_DATA_VALID) == 0)
-    {
-        status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
-    };
+	AD5933_Reset();
+
+	// Initialize sweep with start frequency (this does not start the sweep,
+	// just initializes some parameters)
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
+							AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_INIT_START_FREQ) |
+								AD5933_CONTROL_RANGE(currentRange) |
+								AD5933_CONTROL_PGA_GAIN(currentGain),
+							1);
+
+	// Start the Sweep
+	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
+							AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_START_SWEEP) |
+								AD5933_CONTROL_RANGE(currentRange) |
+								AD5933_CONTROL_PGA_GAIN(currentGain),
+							1);
+	status = 0;
+	while ((status & AD5933_STAT_DATA_VALID) == 0)
+	{
+		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
+	};
 }
 
 /******************************************************************************
@@ -426,40 +425,39 @@ void AD5933_StartSweep(void)
 * @return gainFactor.
 ******************************************************************************/
 double AD5933_CalculateGainFactor(unsigned long calibrationImpedance,
-							   char freqFunction)
+								  char freqFunction)
 {
-	double       gainFactor = 0;
-	double       magnitude  = 0;
-	int          status     = 0;
-	signed short realData   = 0;
-	signed short imgData    = 0;
+	double gainFactor = 0;
+	double magnitude = 0;
+	int status = 0;
+	signed short realData = 0;
+	signed short imgData = 0;
 
 	// Repeat frequency sweep with last set parameters
 	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-							AD5933_CONTROL_FUNCTION(freqFunction)|
-                            AD5933_CONTROL_RANGE(currentRange) | 
-                            AD5933_CONTROL_PGA_GAIN(currentGain),
+							AD5933_CONTROL_FUNCTION(freqFunction) |
+								AD5933_CONTROL_RANGE(currentRange) |
+								AD5933_CONTROL_PGA_GAIN(currentGain),
 							1);
 
 	// Wait for data received to be valid
-	while((status & AD5933_STAT_DATA_VALID) == 0)
+	while ((status & AD5933_STAT_DATA_VALID) == 0)
 	{
 		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
 	}
 
-
 	// Get real and imaginary reg parts
 	signed short RealPart = 0;
 	signed short ImagPart = 0;
-	unsigned char byte          = 0;
+	unsigned char byte = 0;
 	int tmp = 0;
-	
+
 	unsigned char registerAddress = AD5933_REG_REAL_DATA;
-	for(byte = 0;byte < 2;byte ++)
+	for (byte = 0; byte < 2; byte++)
 	{
 		// Read byte from specified registerAddress memory place
-		tmp = wiringPiI2CReadReg8(i2cdevice,registerAddress);
-		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n",registerAddress,tmp);
+		tmp = wiringPiI2CReadReg8(i2cdevice, registerAddress);
+		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n", registerAddress, tmp);
 		// Add this temporal value to our registerValue (remembering that
 		// we are reading bytes that have location value, which means that
 		// each measure we have we not only have to add it to the previous
@@ -469,14 +467,13 @@ double AD5933_CalculateGainFactor(unsigned long calibrationImpedance,
 		// Update value from registerAddress to read next memory position byte
 		registerAddress = registerAddress + 1;
 	}
-	
-	
+
 	registerAddress = AD5933_REG_IMAG_DATA;
-	for(byte = 0;byte < 2;byte ++)
+	for (byte = 0; byte < 2; byte++)
 	{
 		// Read byte from specified registerAddress memory place
-		tmp = wiringPiI2CReadReg8(i2cdevice,registerAddress);
-		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n",registerAddress,tmp);
+		tmp = wiringPiI2CReadReg8(i2cdevice, registerAddress);
+		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n", registerAddress, tmp);
 		// Add this temporal value to our registerValue (remembering that
 		// we are reading bytes that have location value, which means that
 		// each measure we have we not only have to add it to the previous
@@ -486,11 +483,8 @@ double AD5933_CalculateGainFactor(unsigned long calibrationImpedance,
 		// Update value from registerAddress to read next memory position byte
 		registerAddress = registerAddress + 1;
 	}
-	
-	
-	magnitude = sqrt((RealPart * RealPart) + (ImagPart * ImagPart));
-	
 
+	magnitude = sqrt((RealPart * RealPart) + (ImagPart * ImagPart));
 
 	/*
 	// Read real and imaginary data
@@ -500,13 +494,13 @@ double AD5933_CalculateGainFactor(unsigned long calibrationImpedance,
 	// Calculate magnitude
 	magnitude = sqrtf((realData * realData) + (imgData * imgData));
 	*/
-	
+
 	// Calculate gain factor
 	gainFactor = 1 / (magnitude * calibrationImpedance);
 
-	printf("Calibration Step:\n\tR=%hi (%hu)\n\tI=%hi (%hu)\n\t|Z|=%f\n",RealPart,RealPart,ImagPart,ImagPart,magnitude);
+	printf("Calibration Step:\n\tR=%hi (%hu)\n\tI=%hi (%hu)\n\t|Z|=%f\n", RealPart, RealPart, ImagPart, ImagPart, magnitude);
 
-	return(gainFactor);
+	return (gainFactor);
 }
 
 /******************************************************************************
@@ -521,40 +515,39 @@ double AD5933_CalculateGainFactor(unsigned long calibrationImpedance,
 * @return gainFactor.
 ******************************************************************************/
 double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedance,
-							   char freqFunction, double *pSystemPhase)
+												char freqFunction, double *pSystemPhase)
 {
-	double       gainFactor = 0;
-	double       magnitude  = 0;
-	int          status     = 0;
-	signed short realData   = 0;
-	signed short imgData    = 0;
+	double gainFactor = 0;
+	double magnitude = 0;
+	int status = 0;
+	signed short realData = 0;
+	signed short imgData = 0;
 
 	// Repeat frequency sweep with last set parameters
 	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-							AD5933_CONTROL_FUNCTION(freqFunction)|
-                            AD5933_CONTROL_RANGE(currentRange) | 
-                            AD5933_CONTROL_PGA_GAIN(currentGain),
+							AD5933_CONTROL_FUNCTION(freqFunction) |
+								AD5933_CONTROL_RANGE(currentRange) |
+								AD5933_CONTROL_PGA_GAIN(currentGain),
 							1);
 
 	// Wait for data received to be valid
-	while((status & AD5933_STAT_DATA_VALID) == 0)
+	while ((status & AD5933_STAT_DATA_VALID) == 0)
 	{
 		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
 	}
 
-
 	// Get real and imaginary reg parts
 	signed short RealPart = 0;
 	signed short ImagPart = 0;
-	unsigned char byte          = 0;
+	unsigned char byte = 0;
 	int tmp = 0;
-	
+
 	unsigned char registerAddress = AD5933_REG_REAL_DATA;
-	for(byte = 0;byte < 2;byte ++)
+	for (byte = 0; byte < 2; byte++)
 	{
 		// Read byte from specified registerAddress memory place
-		tmp = wiringPiI2CReadReg8(i2cdevice,registerAddress);
-		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n",registerAddress,tmp);
+		tmp = wiringPiI2CReadReg8(i2cdevice, registerAddress);
+		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n", registerAddress, tmp);
 		// Add this temporal value to our registerValue (remembering that
 		// we are reading bytes that have location value, which means that
 		// each measure we have we not only have to add it to the previous
@@ -564,14 +557,13 @@ double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedan
 		// Update value from registerAddress to read next memory position byte
 		registerAddress = registerAddress + 1;
 	}
-	
-	
+
 	registerAddress = AD5933_REG_IMAG_DATA;
-	for(byte = 0;byte < 2;byte ++)
+	for (byte = 0; byte < 2; byte++)
 	{
 		// Read byte from specified registerAddress memory place
-		tmp = wiringPiI2CReadReg8(i2cdevice,registerAddress);
-		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n",registerAddress,tmp);
+		tmp = wiringPiI2CReadReg8(i2cdevice, registerAddress);
+		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n", registerAddress, tmp);
 		// Add this temporal value to our registerValue (remembering that
 		// we are reading bytes that have location value, which means that
 		// each measure we have we not only have to add it to the previous
@@ -581,10 +573,9 @@ double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedan
 		// Update value from registerAddress to read next memory position byte
 		registerAddress = registerAddress + 1;
 	}
-	
-	
+
 	magnitude = sqrt((RealPart * RealPart) + (ImagPart * ImagPart));
-	
+
 	*pSystemPhase = AD5933_CalculatePhaseRAD(RealPart, ImagPart);
 
 	/*
@@ -595,13 +586,13 @@ double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedan
 	// Calculate magnitude
 	magnitude = sqrtf((realData * realData) + (imgData * imgData));
 	*/
-	
+
 	// Calculate gain factor
 	gainFactor = 1 / (magnitude * calibrationImpedance);
 
-	printf("Calibration Step:\n\tR=%hi (%hu)\n\tI=%hi (%hu)\n\t|Z|=%f\n",RealPart,RealPart,ImagPart,ImagPart,magnitude);
+	printf("Calibration Step:\n\tR=%hi (%hu)\n\tI=%hi (%hu)\n\t|Z|=%f\n", RealPart, RealPart, ImagPart, ImagPart, magnitude);
 
-	return(gainFactor);
+	return (gainFactor);
 }
 
 /******************************************************************************
@@ -616,39 +607,36 @@ double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedan
 double AD5933_CalculateImpedance(double gainFactor,
 								 char freqFunction)
 {
-	signed short realData   = 0;
-	signed short imgData    = 0;
-	double       magnitude  = 0;
-	double       impedance  = 0;
-	int          status     = 0;
+	signed short realData = 0;
+	signed short imgData = 0;
+	double magnitude = 0;
+	double impedance = 0;
+	int status = 0;
 
 	// Repeat frequency sweep with last set parameters
 	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-							AD5933_CONTROL_FUNCTION(freqFunction)|
-                            AD5933_CONTROL_RANGE(currentRange) | 
-                            AD5933_CONTROL_PGA_GAIN(currentGain),
+							AD5933_CONTROL_FUNCTION(freqFunction) |
+								AD5933_CONTROL_RANGE(currentRange) |
+								AD5933_CONTROL_PGA_GAIN(currentGain),
 							1);
 
-
-
 	// Wait for data received to be valid
-	while((status & AD5933_STAT_DATA_VALID) == 0)
+	while ((status & AD5933_STAT_DATA_VALID) == 0)
 	{
-		status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
+		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
 	}
-	
-	
+
 	// Get real and imaginary reg parts
 	signed short RealPart = 0;
 	signed short ImagPart = 0;
-	unsigned char byte          = 0;
+	unsigned char byte = 0;
 	int tmp = 0;
-	
+
 	unsigned char registerAddress = AD5933_REG_REAL_DATA;
-	for(byte = 0;byte < 2;byte ++)
+	for (byte = 0; byte < 2; byte++)
 	{
 		// Read byte from specified registerAddress memory place
-		tmp = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+		tmp = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 		//printf("\t\tReading from Register Address: 0x%02x...0x%02x\n",registerAddress,tmp);
 		// Add this temporal value to our registerValue (remembering that
 		// we are reading bytes that have location value, which means that
@@ -659,13 +647,12 @@ double AD5933_CalculateImpedance(double gainFactor,
 		// Update value from registerAddress to read next memory position byte
 		registerAddress = registerAddress + 1;
 	}
-	
-	
+
 	registerAddress = AD5933_REG_IMAG_DATA;
-	for(byte = 0;byte < 2;byte ++)
+	for (byte = 0; byte < 2; byte++)
 	{
 		// Read byte from specified registerAddress memory place
-		tmp = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+		tmp = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 		//printf("\t\tReading from Register Address: 0x%02x...0x%02x\n",registerAddress,tmp);
 		// Add this temporal value to our registerValue (remembering that
 		// we are reading bytes that have location value, which means that
@@ -676,14 +663,12 @@ double AD5933_CalculateImpedance(double gainFactor,
 		// Update value from registerAddress to read next memory position byte
 		registerAddress = registerAddress + 1;
 	}
-	
-	
+
 	magnitude = sqrt((RealPart * RealPart) + (ImagPart * ImagPart));
-	
+
 	//printf("Z = %hi + %hi*i ... |Z| = %f\n",RealPart,ImagPart,magnitude);
-	
+
 	return magnitude;
-	
 
 	//// Read real and imaginary data
 	//realData = AD5933_GetRegisterValue(AD5933_REG_REAL_DATA,2);
@@ -711,44 +696,43 @@ double AD5933_CalculateImpedanceV2(double gainFactor, char freqFunction, signed 
 {
 	//signed short realData   = 0;
 	//signed short imgData    = 0;
-	double       magnitude  = 0;
+	double magnitude = 0;
 	//double       impedance  = 0;
-	int          status     = 0;
+	int status = 0;
 
 	// Repeat frequency sweep with last set parameters
 	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-							AD5933_CONTROL_FUNCTION(freqFunction)|
-                            AD5933_CONTROL_RANGE(currentRange) | 
-                            AD5933_CONTROL_PGA_GAIN(currentGain),
+							AD5933_CONTROL_FUNCTION(freqFunction) |
+								AD5933_CONTROL_RANGE(currentRange) |
+								AD5933_CONTROL_PGA_GAIN(currentGain),
 							1);
 
 	// Wait for data received to imgData
-	while((status & AD5933_STAT_DATA_VALID) == 0)
+	while ((status & AD5933_STAT_DATA_VALID) == 0)
 	{
-		status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
+		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
 	}
-	
-	
+
 	// Get real and imaginary reg parts
 	signed short RealPart = 0;
 	signed short ImagPart = 0;
 	//unsigned char byte = 0;
 	unsigned char registerAddress = 0;
 	int tmpHgh = 0;
-	int tmpLow  = 0;
+	int tmpLow = 0;
 
 	// Se compone la parte REAL desde los 2 registros que la contienen.
 	registerAddress = AD5933_REG_REAL_DATA_HIGH;
-	tmpHgh = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+	tmpHgh = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 	registerAddress = AD5933_REG_REAL_DATA_LOW;
-	tmpLow = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+	tmpLow = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 	RealPart = (tmpHgh << 8) + tmpLow;
 
 	// Se compone la parte IMAGINARIA desde los 2 registros que la contienen.
 	registerAddress = AD5933_REG_IMAG_DATA_HIGH;
-	tmpHgh = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+	tmpHgh = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 	registerAddress = AD5933_REG_IMAG_DATA_LOW;
-	tmpLow = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+	tmpLow = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 	ImagPart = (tmpHgh << 8) + tmpLow;
 
 	*pRealData = RealPart;
@@ -759,9 +743,7 @@ double AD5933_CalculateImpedanceV2(double gainFactor, char freqFunction, signed 
 
 	//printf("Z = %hi + %hi*i ... |Z| = %f\n",RealPart,ImagPart,magnitude);
 	return magnitude;
-
 }
-
 
 /******************************************************************************
 * @brief Calculate impedance 3.
@@ -776,59 +758,58 @@ double AD5933_CalculateImpedanceV3(double gainFactor, char freqFunction, signed 
 {
 	//signed short realData   = 0;
 	//signed short imgData    = 0;
-	double magnitude  = 0;
-    double phase = 0;
+	double magnitude = 0;
+	double phase = 0;
 	//double       impedance  = 0;
-	int          status     = 0;
+	int status = 0;
 
 	// Repeat frequency sweep with last set parameters
 	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-							AD5933_CONTROL_FUNCTION(freqFunction)|
-                            AD5933_CONTROL_RANGE(currentRange) | 
-                            AD5933_CONTROL_PGA_GAIN(currentGain),
+							AD5933_CONTROL_FUNCTION(freqFunction) |
+								AD5933_CONTROL_RANGE(currentRange) |
+								AD5933_CONTROL_PGA_GAIN(currentGain),
 							1);
 
 	// Wait for data received to imgData
-	while((status & AD5933_STAT_DATA_VALID) == 0)
+	while ((status & AD5933_STAT_DATA_VALID) == 0)
 	{
-		status = AD5933_GetRegisterValue(AD5933_REG_STATUS,1);
+		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
 	}
-	
-	
+
 	// Get real and imaginary reg parts
 	signed short RealPart = 0;
 	signed short ImagPart = 0;
 	//unsigned char byte = 0;
 	unsigned char registerAddress = 0;
 	int tmpHgh = 0;
-	int tmpLow  = 0;
+	int tmpLow = 0;
 
 	// Se compone la parte REAL desde los 2 registros que la contienen.
 	registerAddress = AD5933_REG_REAL_DATA_HIGH;
-	tmpHgh = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+	tmpHgh = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 	registerAddress = AD5933_REG_REAL_DATA_LOW;
-	tmpLow = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+	tmpLow = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 	RealPart = (tmpHgh << 8) + tmpLow;
 
 	// Se compone la parte IMAGINARIA desde los 2 registros que la contienen.
 	registerAddress = AD5933_REG_IMAG_DATA_HIGH;
-	tmpHgh = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+	tmpHgh = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 	registerAddress = AD5933_REG_IMAG_DATA_LOW;
-	tmpLow = wiringPiI2CReadReg8(i2cdevice,registerAddress);
+	tmpLow = wiringPiI2CReadReg8(i2cdevice, registerAddress);
 	ImagPart = (tmpHgh << 8) + tmpLow;
 
-    // retorno los valores que estan en los registros
+	// retorno los valores que estan en los registros
 	*pRealData = RealPart;
 	*pImagData = ImagPart;
-    
+
 	phase = AD5933_CalculatePhaseRAD(RealPart, ImagPart);
 
-    // calculo la fase de acuerdo a la hoja de datos
-    // real / imaginario / cuadrante
-    // + / + : 1
-    // + / - : 2
-    // - / - : 3
-    // - / + : 4
+	// calculo la fase de acuerdo a la hoja de datos
+	// real / imaginario / cuadrante
+	// + / + : 1
+	// + / - : 2
+	// - / - : 3
+	// - / + : 4
 
 	/*
 	if(RealPart >= 0 && ImagPart >= 0){
@@ -844,7 +825,7 @@ double AD5933_CalculateImpedanceV3(double gainFactor, char freqFunction, signed 
     }
 	*/
 
-/*
+	/*
     if(RealPart >= 0 && ImagPart >= 0){
         phase = atan(ImagPart/RealPart)*(180/M_PI);
     }else if(RealPart < 0 && ImagPart >= 0){
@@ -857,14 +838,13 @@ double AD5933_CalculateImpedanceV3(double gainFactor, char freqFunction, signed 
         phase = -100;
     }
 */
-    *pPhase = phase;
+	*pPhase = phase;
 
 	// Se calcula la Magnitud
 	magnitude = sqrt((RealPart * RealPart) + (ImagPart * ImagPart));
 
 	//printf("Z = %hi + %hi*i ... |Z| = %f\n",RealPart,ImagPart,magnitude);
 	return magnitude;
-
 }
 
 /******************************************************************************
@@ -876,27 +856,41 @@ double AD5933_CalculateImpedanceV3(double gainFactor, char freqFunction, signed 
 *
 * @return phase.
 *******************************************************************************/
-double AD5933_CalculatePhaseRAD(signed short RealPart, signed short ImagPart){
-    double phase = 0;
+double AD5933_CalculatePhaseRAD(signed short RealPart, signed short ImagPart)
+{
+	double phase = 0;
 
-	if(RealPart >= 0 && ImagPart >= 0){
-        phase = atan(ImagPart/RealPart);
-    }else if(RealPart < 0 && ImagPart >= 0){
-        phase = M_PI + atan(ImagPart/RealPart);
-    }else if(RealPart < 0 && ImagPart < 0){
-        phase = M_PI + atan(ImagPart/RealPart);
-    }else if(RealPart >= 0 && ImagPart < 0){
-        phase = 2*M_PI + atan(ImagPart/RealPart);
-    }else{
-        phase = -100;
-    }
-
+	if (RealPart == 0)
+	{
+		phase = -200;
+	}
+	else
+	{
+		if (RealPart > 0 && ImagPart >= 0)
+		{
+			phase = atan(ImagPart / RealPart);
+		}
+		else if (RealPart < 0 && ImagPart >= 0)
+		{
+			phase = M_PI + atan(ImagPart / RealPart);
+		}
+		else if (RealPart < 0 && ImagPart < 0)
+		{
+			phase = M_PI + atan(ImagPart / RealPart);
+		}
+		else if (RealPart > 0 && ImagPart < 0)
+		{
+			phase = 2 * M_PI + atan(ImagPart / RealPart);
+		}
+		else
+		{
+			phase = -100;
+		}
+	}
 	return phase;
 }
 
-
-
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Reads the real and the imaginary data and calculates the Gain Factor.
  *
  * @param calibrationImpedance - The calibration impedance value.
@@ -937,7 +931,7 @@ double AD5933_CalculatePhaseRAD(signed short RealPart, signed short ImagPart){
     return gainFactor;
 }*/
 
-/***************************************************************************//**
+/***************************************************************************/ /**
  * @brief Reads the real and the imaginary data and calculates the Impedance.
  *
  * @param gainFactor   - The gain factor.
@@ -975,7 +969,7 @@ double AD5933_CalculatePhaseRAD(signed short RealPart, signed short ImagPart){
     return impedance;    
 }*/
 
-/**************************************************************************//**
+/**************************************************************************/ /**
  * @brief Set AD5933 to standby mode
  * 
  * @return none
@@ -984,15 +978,8 @@ double AD5933_CalculatePhaseRAD(signed short RealPart, signed short ImagPart){
 void AD5933_SetToStandBy(void)
 {
 	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
-								AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_STANDBY) |
-								AD5933_CONTROL_RANGE(currentRange) | 
+							AD5933_CONTROL_FUNCTION(AD5933_FUNCTION_STANDBY) |
+								AD5933_CONTROL_RANGE(currentRange) |
 								AD5933_CONTROL_PGA_GAIN(currentGain),
-								1);
-								
+							1);
 }
-
-
-
-
-
-

@@ -259,7 +259,7 @@ int main(void)
 	scanf("%s", &string_tmp);
 
 	char idMedicion[100];
-	sprintf(idMedicion, "%s",&string_tmp);
+	sprintf(idMedicion, "%s", &string_tmp);
 	char idMedicionCtrl[200];
 	sprintf(idMedicionCtrl, "%s_%g_%s", idMedicion, AD5933_CALIBRATION_IMPEDANCE, outFormatTime);
 
@@ -311,7 +311,16 @@ int main(void)
 		// Linea original
 		// magnitude = AD5933_CalculateImpedance(gainFactor, AD5933_FUNCTION_REPEAT_FREQ);
 		// Linea que obtiene tambien los datos parte Real/Imaginaria
-		magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
+		
+		if (i == 0)
+		{
+			magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
+		}
+		else
+		{
+			magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_INC_FREQ, &RealPart, &ImagPart, &meansurePhase);
+		}
+
 		// magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_INC_FREQ, &RealPart, &ImagPart, &meansurePhase);
 
 		//Z_MOD[i] = magnitude;
@@ -336,8 +345,6 @@ int main(void)
 		Z_REAL[freq_iter] = RealPart;
 		CurrentFrequency = START_FREQ + INCREMENT_FREQ * freq_iter;
 
-		// Print impedance
-		printf("Impedance read: %f ohms (phase: %f) (@ %lu Hz) (dif: %f)\n\r", impedance, phase, CurrentFrequency, (impedance / Calibration_Impedance - 1) * 100);
 		// printf("TEMPERATURE: %lu\n",TEMPERATURE);
 		fprintf(fout, "%f\t%f\t%lu\n", impedance, phase, CurrentFrequency);
 		fprintf(fout2, "%d\t%d\t%f\t%f\t%lu\n", RealPart, ImagPart, impedance, phase, CurrentFrequency);
@@ -348,6 +355,8 @@ int main(void)
 		fflush(gnuplot);
 
 		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
+		// Print impedance
+		printf("%03d - Impedance read: %f ohms (phase: %f) (@ %lu Hz) [%d]\n", i, impedance, phase, CurrentFrequency, status);
 		freq_iter += 1;
 	}
 	/*while ((status & AD5933_STAT_SWEEP_DONE) == 0)
@@ -408,11 +417,11 @@ int main(void)
 	printf("Debug: Actualizando archivo de control. Iniciando.\n");
 
 	// Archivo de control de ejecuciones
-	const char* fileNameControl = "pmodia.control.txt";
+	const char *fileNameControl = "pmodia.control.txt";
 	FILE *fctl;
 	fctl = fopen(fileNameControl, "a");
-	fseek(fctl,0,SEEK_END);
-	if(ftell(fctl) == 0)
+	fseek(fctl, 0, SEEK_END);
+	if (ftell(fctl) == 0)
 	{
 		printf("Debug: Actualizando archivo de control. Creando Titulos.\n");
 
@@ -471,7 +480,6 @@ int main(void)
 	fclose(fctl); // archivo extendido
 
 	printf("Debug: Actualizando archivo de control. finalizando.\n");
-
 
 	return 0;
 

@@ -201,9 +201,9 @@ int main(void)
 
 	// Define some variables
 	CurrentFrequency = START_FREQ;
-	double Z_MOD[NPOINTS] = {0};
-	double Z_REAL[NPOINTS] = {0};
-	double Z_IMAG[NPOINTS] = {0};
+	double Z_MOD[NPOINTS+1] = {0};
+	double Z_REAL[NPOINTS+1] = {0};
+	double Z_IMAG[NPOINTS+1] = {0};
 	double impedance = 0;
 	double impedanceMax = 0;
 	double impedanceMin = __DBL_MAX__;
@@ -217,7 +217,6 @@ int main(void)
 	double phaseAvg = 0;
 	double phaseTot = 0;
 	int WINDOW = 5;
-
 
 	// Proceso de toma de muestras
 	// crear todas las variables a utilizar
@@ -241,48 +240,51 @@ int main(void)
 
 	int repetirProceso = 1;
 
-	do{
+	do
+	{
+		
+		status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
+		printf("AD5933 - status - %d\n",status);
+
 		// Preparo el equipo para una lectura.
+		printf("AD5933 - Reset\n");
 		AD5933_Reset();
 
-	// Set the Range and Gain
-	printf("\n Setting Range to %d and Gain to %d     \n ", currentRange, currentGain);
-	AD5933_SetRangeAndGain(currentRange, currentGain);
-	printf(" Done!\n");
+		// Set the Range and Gain
+		printf("AD5933 - Setting Range to %d and Gain to %d \n", currentRange, currentGain);
+		AD5933_SetRangeAndGain(currentRange, currentGain);
 
 		// Configure sweep
-		printf("\n Configuring the Sweep \n ");
+		printf("AD5933 - Configuring the Sweep\n");
 		AD5933_ConfigSweep(START_FREQ, INCREMENT_FREQ, NPOINTS);
-		printf(" Done!\n");
 
 		// Start the sweep
+		printf("AD5933 - Start Sweep\n");
 		AD5933_StartSweep();
 
 		// Calculate gain factor for calibration impedance
-		printf("\n Calculating Gain Factor \n");
-
+		printf("AD5933 - Calculating Gain Factor and SystemPhase\n");
 		gainFactor = AD5933_CalculateGainFactorAndSystemPhase(AD5933_CALIBRATION_IMPEDANCE,
 															  AD5933_FUNCTION_REPEAT_FREQ, &systemPhase);
-		printf("Done!...\n");
 		printf("---> Gain Factor  estimated to be: %g\n", gainFactor);
 		printf("---> System Phase estimated to be: %g\n", systemPhase);
 
 		// Make a single impedance measurement to make sure we have
 		// calibrated the board correctly
-		magnitude = AD5933_CalculateImpedance(gainFactor,
-											  AD5933_FUNCTION_REPEAT_FREQ);
+		printf("AD5933 - Calculating Impedance\n");
+		magnitude = AD5933_CalculateImpedance(gainFactor, AD5933_FUNCTION_REPEAT_FREQ);
 		printf("Recalculated Z = %f .. \nOriginal one had a value of: %f ... \nError = %f%%\n", (1 / (gainFactor * magnitude)), AD5933_CALIBRATION_IMPEDANCE, 100 * abs((AD5933_CALIBRATION_IMPEDANCE - (1 / (gainFactor * magnitude)))) / AD5933_CALIBRATION_IMPEDANCE);
 
 		// Punto de Replicacion
 		// Crear todas las variables locales que se usaran sucesivamente
 
-		printf("\nMeasurement Identification (reemplazar el componente a medir): ");
+		printf("AD5933 - Measurement Identification (reemplazar el componente a medir): ");
 		scanf("%s", &string_tmp);
 
 		sprintf(idMedicion, "%s", &string_tmp);
 		sprintf(idMedicionCtrl, "%s_%g_%s", idMedicion, AD5933_CALIBRATION_IMPEDANCE, outFormatTime);
 
-		printf("\nIdMedicion : %s (%s)\n", idMedicion, idMedicionCtrl);
+		printf("IdMedicion : %s (%s)\n", idMedicion, idMedicionCtrl);
 		sprintf(fileName2, "%s.txt", idMedicionCtrl);
 
 		printf("Debug: Obteniendo el registro de status.\n");
@@ -306,36 +308,44 @@ int main(void)
 
 		RealPart = 0;
 		ImagPart = 0;
-		freq_iter = 1;
+		freq_iter = 0;
 
+		printf("Debug: Iniciando el barrido. [%d]\n", AD5933_GetRegisterValue(AD5933_REG_STATUS, 1));
 		i = 0;
-		for (i = 0; i < NPOINTS; i++)
+		for (i = 0; i < (NPOINTS+1); i++)
 		{
-			//TEMPERATURE
-			//TEMPERATURE = AD5933_GetTemperature();
+			CurrentFrequency = START_FREQ + INCREMENT_FREQ * freq_iter;
 
-			// Calculate impedance between Vout and Vin
-			// printf("AD5933_CalculateImpedanceV3");
-			magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
-			impedance = (1 / (gainFactor * magnitude));
+			// magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
+			if(freq_iter==0){
+				magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
+			}else{
+				magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_INC_FREQ, &RealPart, &ImagPart, &meansurePhase);
+			}
+			if((gainFactor*magnitude)==0){
+				impedance = -100;
+			}else{
+				impedance = (1 / (gainFactor * magnitude));
+			}
+
 			phase = meansurePhase - systemPhase;
 
-			if (impedanceMax < impedance) impedanceMax = impedance;
-			if (impedanceMin > impedance) impedanceMin = impedance;
+			if (impedanceMax < impedance)
+				impedanceMax = impedance;
+			if (impedanceMin > impedance)
+				impedanceMin = impedance;
 			impedanceTot = impedanceTot + impedance;
 
-			if (phaseMax < phase) phaseMax = phase;
-			if (phaseMin > phase) phaseMin = phase;
+			if (phaseMax < phase)
+				phaseMax = phase;
+			if (phaseMin > phase)
+				phaseMin = phase;
 			phaseTot = phaseTot + phase;
 
-			printf("Z_MOD:");
 			Z_MOD[freq_iter] = impedance;
 			Z_IMAG[freq_iter] = ImagPart;
 			Z_REAL[freq_iter] = RealPart;
-			CurrentFrequency = START_FREQ + INCREMENT_FREQ * freq_iter;
 
-			// Print impedance
-			printf("Impedance read: %f ohms (phase: %f) (@ %lu Hz) (dif: %f)\n\r", impedance, phase, CurrentFrequency, (impedance / Calibration_Impedance - 1) * 100);
 			// printf("TEMPERATURE: %lu\n",TEMPERATURE);
 			fprintf(fout, "%f\t%f\t%lu\n", impedance, phase, CurrentFrequency);
 			fprintf(fout2, "%d\t%d\t%f\t%f\t%lu\n", RealPart, ImagPart, impedance, phase, CurrentFrequency);
@@ -346,6 +356,7 @@ int main(void)
 			fflush(gnuplot);
 
 			status = AD5933_GetRegisterValue(AD5933_REG_STATUS, 1);
+			printf("%03d Impedance read: %f ohms (phase: %f) (@ %lu Hz) [%d]\n", i, impedance, phase, CurrentFrequency, status);
 			freq_iter += 1;
 		}
 
@@ -428,7 +439,7 @@ int main(void)
 		fflush(stdin);
 		printf("\nDesea realizar una nueva medicion? (Y/N)");
 		scanf("%s", &askYN);
-		printf("[ %s ]",&askYN);
+		printf("[ %s ]", &askYN);
 		if (askYN != 'Y' && askYN != 'y')
 		{
 			break;

@@ -1,6 +1,6 @@
 CXX = g++
 #CFLAGS = -std=c99 -Wall -I.
-CXXFLAGS = -O3 -Wall -Wunused-variable
+CXXFLAGS = -g -O3 -Wall -Wunused-variable
 CXXINCLUDE = -I/usr/local/include
 
 LINKER = g++ -o
