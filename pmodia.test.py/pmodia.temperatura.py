@@ -4,12 +4,13 @@ import time
 i2c_ch = 1
 i2c_address = 0x0d
 nroRepeticiones = 10
+segundosEspera = 2
 
-print(f"inicializando el bus en el canal {i2c_ch}. y en la direccion {i2c_address}.")
+print(f"inicializando el bus en el canal {i2c_ch}. y en la direccion {hex(i2c_address)}.")
 i2cbus = smbus.SMBus(i2c_ch)
 
-print(f"Se realizaran {nroRepeticiones}.")
-for x in range(nroRepeticiones):
+print(f"Se realizaran {nroRepeticiones} mediciones separadas por {segundosEspera} segundos.")
+for nroMedicion in range(nroRepeticiones):
     # seteo modo de lectura de temperatura
     val = i2cbus.write_byte_data(i2c_address, 0x80, 0x91)
     val = i2cbus.write_byte_data(i2c_address, 0x81, 0x00)
@@ -28,5 +29,5 @@ for x in range(nroRepeticiones):
         dataTempAjus = dataTempBase / 32.0
     else:
         dataTempAjus = (dataTempBase - 16384 ) / 32.0
-    print("status:", status8F, bin(status8F)," - ", status8F & 0x1, " - ", "temp:",bin(dataHi),bin(dataLo),bin(dataTempBase), dataTempBase,dataTempAjus)
-    time.sleep(1)
+    print(nroMedicion, "status:", status8F, bin(status8F)," - ", status8F & 0x1, " - ", "temp:",bin(dataHi),bin(dataLo),bin(dataTempBase), dataTempBase,dataTempAjus)
+    time.sleep(segundosEspera)

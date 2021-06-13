@@ -311,8 +311,8 @@ int main(void)
 		// Linea original
 		// magnitude = AD5933_CalculateImpedance(gainFactor, AD5933_FUNCTION_REPEAT_FREQ);
 		// Linea que obtiene tambien los datos parte Real/Imaginaria
-		// magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
-		magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_INC_FREQ, &RealPart, &ImagPart, &meansurePhase);
+		magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_REPEAT_FREQ, &RealPart, &ImagPart, &meansurePhase);
+		// magnitude = AD5933_CalculateImpedanceV3(gainFactor, AD5933_FUNCTION_INC_FREQ, &RealPart, &ImagPart, &meansurePhase);
 
 		//Z_MOD[i] = magnitude;
 		//Z_MOD[freq_iter] = 1/magnitude;
