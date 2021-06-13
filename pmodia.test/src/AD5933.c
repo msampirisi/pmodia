@@ -860,32 +860,33 @@ double AD5933_CalculatePhaseRAD(signed short RealPart, signed short ImagPart)
 {
 	double phase = 0;
 
-	if (RealPart == 0)
+	if (RealPart > 0 && ImagPart >= 0)
 	{
-		phase = -200;
+		phase = atan(ImagPart / RealPart);
+	}
+	else if (RealPart < 0 && ImagPart >= 0)
+	{
+		phase = M_PI + atan(ImagPart / RealPart);
+	}
+	else if (RealPart < 0 && ImagPart < 0)
+	{
+		phase = M_PI + atan(ImagPart / RealPart);
+	}
+	else if (RealPart > 0 && ImagPart < 0)
+	{
+		phase = 2 * M_PI + atan(ImagPart / RealPart);
+	}
+	else if (RealPart = 0 && ImagPart >= 0)
+	{
+		phase = M_PI / 2;
+	}
+	else if (RealPart = 0 && ImagPart < 0)
+	{
+		phase = M_PI + M_PI / 2;
 	}
 	else
 	{
-		if (RealPart > 0 && ImagPart >= 0)
-		{
-			phase = atan(ImagPart / RealPart);
-		}
-		else if (RealPart < 0 && ImagPart >= 0)
-		{
-			phase = M_PI + atan(ImagPart / RealPart);
-		}
-		else if (RealPart < 0 && ImagPart < 0)
-		{
-			phase = M_PI + atan(ImagPart / RealPart);
-		}
-		else if (RealPart > 0 && ImagPart < 0)
-		{
-			phase = 2 * M_PI + atan(ImagPart / RealPart);
-		}
-		else
-		{
-			phase = -100;
-		}
+		phase = -100;
 	}
 	return phase;
 }
