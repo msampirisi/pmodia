@@ -343,7 +343,7 @@ int main(void)
 		sprintf(idMedicionCtrl, "%s_%g_%s", idMedicion, AD5933_CALIBRATION_IMPEDANCE, outFormatTime);
 
 		printf("IdMedicion : %s (%s)\n", idMedicion, idMedicionCtrl);
-		sprintf(fileName2, "%s.txt", idMedicionCtrl);
+		sprintf(fileName2, "%s.friip.txt", idMedicionCtrl);
 
 		printf("Debug: Obteniendo el registro de status.\n");
 
@@ -365,7 +365,7 @@ int main(void)
 		fprintf(gnuplot, "plot '-' with lines\n");
 
 		printf("Debug: fout2 - titulando.\n");
-		fprintf(fout2, "P.Real\tP.Imag\timpedance\tphase\tfrequency\n");
+		fprintf(fout2, "frequency\tP.Real\tP.Imag\timpedance\tphase\n");
 
 		RealPart = 0;
 		ImagPart = 0;
@@ -416,7 +416,7 @@ int main(void)
 
 			// printf("TEMPERATURE: %lu\n",TEMPERATURE);
 			fprintf(fout, "%f\t%f\t%lu\n", impedance, phase, CurrentFrequency);
-			fprintf(fout2, "%d\t%d\t%f\t%f\t%lu\n", RealPart, ImagPart, impedance, phase, CurrentFrequency);
+			fprintf(fout2, "%lu\t%d\t%d\t%f\t%f\n", CurrentFrequency, RealPart, ImagPart, impedance, phase);
 			//fprintf(gnuplot, "%lu %f\n", CurrentFrequency, impedance);
 			fprintf(gnuplot, "%lu %d\n", CurrentFrequency, ImagPart);
 			//fprintf(gnuplot, "%lu %d\n", CurrentFrequency, ImagPart);
