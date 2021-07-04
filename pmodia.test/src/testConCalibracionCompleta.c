@@ -250,7 +250,7 @@ int main(void)
 
 	char idMedicion[100];
 	char idMedicionCtrl[200];
-	char fileName2[204];
+	char fileName2[210];
 
 	FILE *gnuplot;
 	FILE *fout;
