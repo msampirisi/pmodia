@@ -29,6 +29,7 @@ for nroMedicion in range(nroRepeticiones):
     # leo los 2 bytes que almacenan la temperatura 
     dataHi = i2cbus.read_byte_data(i2c_address, 0x92)
     dataLo = i2cbus.read_byte_data(i2c_address, 0x93)
+    # construyo el numero de 16 bits
     dataTempBase = (dataHi << 8) + dataLo
     # se realizan los calculos de acuerdo a la hoja de datos del modulo
     if dataTempBase < 8192:
