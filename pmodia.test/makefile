@@ -17,7 +17,7 @@ rm = rm -f
 #	${CXX} ${CXXFLAGS} -c ${SRCDIR}/ad5933.c
 #	@echo "Compilando "$<" finalizado."
 
-all: clean $(BINDIR)/pmodia.test $(BINDIR)/pmodia.test.2 $(BINDIR)/pmodia.test.C.C
+all: clean $(BINDIR)/pmodia.test $(BINDIR)/pmodia.test.2 $(BINDIR)/pmodia.test.C.C $(BINDIR)/pmodia.rango
 	@echo "Proceso Finalizado."
 
 $(BINDIR)/pmodia.test:
@@ -35,11 +35,17 @@ $(BINDIR)/pmodia.test.C.C:
 	$(CXX) $(CXXFLAGS) $(CXXINCLUDE) -pipe $(LFLAGS) $(LLIB) -o $(BINDIR)/pmodia.test.C.C $(SRCDIR)/testConCalibracionCompleta.c
 	@echo "Compilando "$@" - Finalizado"
 
+$(BINDIR)/pmodia.rango:
+	@echo "Compilando "$@" - Iniciando"
+	$(CXX) $(CXXFLAGS) $(CXXINCLUDE) -pipe $(LFLAGS) $(LLIB) -o $(BINDIR)/pmodia.rango $(SRCDIR)/testrangosinparam.c
+	@echo "Compilando "$@" - Finalizado"
+
 clean:
 	@echo "Limpiando archivos ejecutables/objeto"
 	rm -f $(BINDIR)/pmodia.test
 	rm -f $(BINDIR)/pmodia.test.2
 	rm -f $(BINDIR)/pmodia.test.C.C
+	rm -f $(BINDIR)/pmodia.rango
 	@echo "Ejecutables removido."
 
 
