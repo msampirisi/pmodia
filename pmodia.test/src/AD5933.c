@@ -584,7 +584,7 @@ double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedan
 	{
 		// Read byte from specified registerAddress memory place
 		tmp = wiringPiI2CReadReg8(i2cdevice, registerAddress);
-		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n", registerAddress, tmp);
+		// printf("\t\tReading from Register Address: 0x%02x...0x%02x\n", registerAddress, tmp);
 		// Add this temporal value to our registerValue (remembering that
 		// we are reading bytes that have location value, which means that
 		// each measure we have we not only have to add it to the previous
@@ -600,7 +600,7 @@ double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedan
 	{
 		// Read byte from specified registerAddress memory place
 		tmp = wiringPiI2CReadReg8(i2cdevice, registerAddress);
-		printf("\t\tReading from Register Address: 0x%02x...0x%02x\n", registerAddress, tmp);
+		// printf("\t\tReading from Register Address: 0x%02x...0x%02x\n", registerAddress, tmp);
 		// Add this temporal value to our registerValue (remembering that
 		// we are reading bytes that have location value, which means that
 		// each measure we have we not only have to add it to the previous
@@ -627,7 +627,7 @@ double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedan
 	// Calculate gain factor
 	gainFactor = 1 / (magnitude * calibrationImpedance);
 
-	printf("Calibration Step:\n\tR=%hi (%hu)\n\tI=%hi (%hu)\n\t|Z|=%f\n", RealPart, RealPart, ImagPart, ImagPart, magnitude);
+	// printf("Calibration Step:\n\tR=%hi (%hu)\n\tI=%hi (%hu)\n\t|Z|=%f\n", RealPart, RealPart, ImagPart, ImagPart, magnitude);
 
 	return (gainFactor);
 }
@@ -923,7 +923,7 @@ double AD5933_CalculatePhaseRAD(signed short RealPart, signed short ImagPart)
 	}
 	else
 	{
-		phase = -100;
+		phase = 0;
 	}
 	return phase;
 }

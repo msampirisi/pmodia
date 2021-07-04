@@ -293,21 +293,35 @@ int main(void)
 	{
 		CurrentFrequency = START_FREQ + INCREMENT_FREQ * freq_iter;
 		// Calculate gain factor for calibration impedance
+	if (freq_iter == 0)
+			{
 		gainFactor = AD5933_CalculateGainFactorAndSystemPhase(AD5933_CALIBRATION_IMPEDANCE,
 															  AD5933_FUNCTION_REPEAT_FREQ, &systemPhase);
-		printf("---> Gain Factor  estimated to be: %g\n", gainFactor);
-		printf("---> System Phase estimated to be: %g\n", systemPhase);
+			}
+			else
+			{
+		gainFactor = AD5933_CalculateGainFactorAndSystemPhase(AD5933_CALIBRATION_IMPEDANCE,
+															  AD5933_FUNCTION_INC_FREQ, &systemPhase);
+			}
+
+		// printf("---> Gain Factor  estimated to be: %g\n", gainFactor);
+		// printf("---> System Phase estimated to be: %g\n", systemPhase);
 		CalibrationGainFactor[i] = gainFactor;
 		CalibrationSystemPhase[i] = systemPhase;
 
 		// Make a single impedance measurement to make sure we have
 		// calibrated the board correctly
-		printf("AD5933 - Calculating Impedance\n");
+		// printf("AD5933 - Calculating Impedance\n");
 		magnitude = AD5933_CalculateImpedance(gainFactor, AD5933_FUNCTION_REPEAT_FREQ);
 		printf("[Gain : %g / Phase : %g ] Recalculated Z = %f .. \nOriginal one had a value of: %f ... \nError = %f%%\n",gainFactor, systemPhase, (1 / (gainFactor * magnitude)), AD5933_CALIBRATION_IMPEDANCE, 100 * abs((AD5933_CALIBRATION_IMPEDANCE - (1 / (gainFactor * magnitude)))) / AD5933_CALIBRATION_IMPEDANCE);
 		freq_iter += 1;
 	}
 
+/*
+	unsigned long START_FREQ = 3000;	 // in Hertz (unsigned long has 32 bits, from which we will only need 24)
+	unsigned long INCREMENT_FREQ = 1000; // in Hertz
+	unsigned short NPOINTS = 100;
+*/
 	do
 	{
 
@@ -340,13 +354,16 @@ int main(void)
 		// Initialize variables for output txt file and gnuplot
 		printf("Debug: Inicializando gnuplot.\n");
 		gnuplot = popen("gnuplot -persistent", "w");
+
 		printf("Debug: Inicializando fout.\n");
 		fout = fopen("out.txt", "w");
 		printf("Debug: Inicializando fout2.\n");
 		fout2 = fopen(fileName2, "w");
 
 		printf("Debug: Inicializando gnuplot - plot - with lines.\n");
+		fprintf(gnuplot, "set title \"Impedancia\" \n");
 		fprintf(gnuplot, "plot '-' with lines\n");
+
 		printf("Debug: fout2 - titulando.\n");
 		fprintf(fout2, "P.Real\tP.Imag\timpedance\tphase\tfrequency\n");
 
@@ -372,7 +389,7 @@ int main(void)
 
 			if ((CalibrationGainFactor[i] * magnitude) == 0)
 			{
-				impedance = -100;
+				impedance = AD5933_CALIBRATION_IMPEDANCE;
 			}
 			else
 			{
@@ -400,7 +417,9 @@ int main(void)
 			// printf("TEMPERATURE: %lu\n",TEMPERATURE);
 			fprintf(fout, "%f\t%f\t%lu\n", impedance, phase, CurrentFrequency);
 			fprintf(fout2, "%d\t%d\t%f\t%f\t%lu\n", RealPart, ImagPart, impedance, phase, CurrentFrequency);
-			fprintf(gnuplot, "%lu %f\n", CurrentFrequency, impedance);
+			//fprintf(gnuplot, "%lu %f\n", CurrentFrequency, impedance);
+			fprintf(gnuplot, "%lu %d\n", CurrentFrequency, ImagPart);
+			//fprintf(gnuplot, "%lu %d\n", CurrentFrequency, ImagPart);
 
 			fflush(fout);
 			fflush(fout2);
@@ -412,10 +431,13 @@ int main(void)
 		}
 
 		fprintf(gnuplot, "e\n");
+
 		fflush(gnuplot);
 
 		fclose(fout);
 		fclose(fout2); // archivo extendido
+
+		fclose(gnuplot);
 
 		printf("\n Obteniendo Temperatura : \n");
 		temperatureFinal = AD5933_GetTemperatureV2();

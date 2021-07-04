@@ -118,7 +118,8 @@ extern float AD5933_CALIBRATION_IMPEDANCE;
 #define AD5933_ADDR_POINTER 0xB0
 
 /* AD5933 Specifications */
-#define AD5933_INTERNAL_SYS_CLK 16000000ul // 16MHz
+// #define AD5933_INTERNAL_SYS_CLK 16000000ul // 16MHz
+#define AD5933_INTERNAL_SYS_CLK 16776000ul // 16MHz
 #define AD5933_MAX_INC_NUM 511             // Maximum increment number
 #define AD5933_CALIBRATION_RFB 20000       // Calibration voltage-to-current gain feedback resistor is 20k for the pmodIA board
 
