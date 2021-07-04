@@ -281,7 +281,7 @@ int main(void)
 		AD5933_SetRangeAndGain(currentRange, currentGain);
 
 		// Configure sweep
-		printf("AD5933 - Configuring the Sweep for gainFactor and System\n");
+		printf("AD5933 - Configuring the Sweep\n");
 		AD5933_ConfigSweep(START_FREQ, INCREMENT_FREQ, NPOINTS);
 
 		// Start the sweep

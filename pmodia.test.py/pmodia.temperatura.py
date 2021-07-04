@@ -9,7 +9,7 @@ import time
 
 i2c_ch = 1
 i2c_address = 0x0d
-nroRepeticiones = 10
+nroRepeticiones = 100
 segundosEspera = 2
 
 print(f"inicializando el bus en el canal {i2c_ch}. y en la direccion {hex(i2c_address)}.")

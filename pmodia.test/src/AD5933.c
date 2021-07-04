@@ -150,9 +150,46 @@ unsigned long AD5933_GetRegisterValue(unsigned char registerAddress,
 *******************************************************************************/
 void AD5933_Reset(void)
 {
+	/*
+	printf("Reset - Debug - I");
+	printf("Registro \t valor\n");
+	printf("0x80\t%x\n",AD5933_GetRegisterValue(0x80,2));
+	printf("0x82\t%x\n",AD5933_GetRegisterValue(0x82,1));
+	printf("0x83\t%x\n",AD5933_GetRegisterValue(0x83,2));
+	printf("0x85\t%x\n",AD5933_GetRegisterValue(0x85,1));
+	printf("0x86\t%x\n",AD5933_GetRegisterValue(0x86,2));
+	printf("0x88\t%x\n",AD5933_GetRegisterValue(0x88,2));
+	printf("0x8A\t%x\n",AD5933_GetRegisterValue(0x8A,1));
+	printf("0x8B\t%x\n",AD5933_GetRegisterValue(0x8B,1));
+	printf("0x8F\t%x\n",AD5933_GetRegisterValue(0x8F,1));
+	printf("0x92\t%x\n",AD5933_GetRegisterValue(0x92,2));
+	printf("0x94\t%x\n",AD5933_GetRegisterValue(0x94,2));
+	printf("0x96\t%x\n",AD5933_GetRegisterValue(0x96,2));
+	printf("Debug - F");
+	*/
+
 	AD5933_SetRegisterValue(AD5933_REG_CONTROL_LB,
 							AD5933_CONTROL_RESET | currentClockSource,
 							1);
+
+	/*
+	printf("Reset - Debug - F");
+	printf("Registro \t valor\n");
+	printf("0x80\t%x\n",AD5933_GetRegisterValue(0x80,2));
+	printf("0x82\t%x\n",AD5933_GetRegisterValue(0x82,1));
+	printf("0x83\t%x\n",AD5933_GetRegisterValue(0x83,2));
+	printf("0x85\t%x\n",AD5933_GetRegisterValue(0x85,1));
+	printf("0x86\t%x\n",AD5933_GetRegisterValue(0x86,2));
+	printf("0x88\t%x\n",AD5933_GetRegisterValue(0x88,2));
+	printf("0x8A\t%x\n",AD5933_GetRegisterValue(0x8A,1));
+	printf("0x8B\t%x\n",AD5933_GetRegisterValue(0x8B,1));
+	printf("0x8F\t%x\n",AD5933_GetRegisterValue(0x8F,1));
+	printf("0x92\t%x\n",AD5933_GetRegisterValue(0x92,2));
+	printf("0x94\t%x\n",AD5933_GetRegisterValue(0x94,2));
+	printf("0x96\t%x\n",AD5933_GetRegisterValue(0x96,2));
+	printf("Debug - F");
+	*/
+
 }
 
 /***************************************************************************/ /**
