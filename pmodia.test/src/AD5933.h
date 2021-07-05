@@ -142,6 +142,9 @@ unsigned long AD5933_GetRegisterValue(unsigned char registerAddress,
 /*! Resets the device. */
 void AD5933_Reset(void);
 
+/*! Show all registers.*/
+void AD5933_ShowAllRegisters(void);
+
 /*! Selects the source of the system clock. */
 void AD5933_SetSystemClk(char clkSource, unsigned long extClkFreq);
 

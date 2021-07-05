@@ -210,13 +210,10 @@ int main(void)
 	printf("Debug - I");
 	printf("Registro \t valor\n");
 	printf("0x80\t%x\n", AD5933_GetRegisterValue(0x80, 2));
-	printf("0x82\t%x\n", AD5933_GetRegisterValue(0x82, 1));
-	printf("0x83\t%x\n", AD5933_GetRegisterValue(0x83, 2));
-	printf("0x85\t%x\n", AD5933_GetRegisterValue(0x85, 1));
-	printf("0x86\t%x\n", AD5933_GetRegisterValue(0x86, 2));
+	printf("0x82\t%x\n", AD5933_GetRegisterValue(0x82, 3));
+	printf("0x85\t%x\n", AD5933_GetRegisterValue(0x85, 3));
 	printf("0x88\t%x\n", AD5933_GetRegisterValue(0x88, 2));
-	printf("0x8A\t%x\n", AD5933_GetRegisterValue(0x8A, 1));
-	printf("0x8B\t%x\n", AD5933_GetRegisterValue(0x8B, 1));
+	printf("0x8A\t%x\n", AD5933_GetRegisterValue(0x8A, 2));
 	printf("0x8F\t%x\n", AD5933_GetRegisterValue(0x8F, 1));
 	printf("0x92\t%x\n", AD5933_GetRegisterValue(0x92, 2));
 	printf("0x94\t%x\n", AD5933_GetRegisterValue(0x94, 2));
@@ -280,6 +277,19 @@ int main(void)
 	// Configure sweep
 	printf("AD5933 - Configuring the Sweep\n");
 	AD5933_ConfigSweep(START_FREQ, INCREMENT_FREQ, NPOINTS);
+
+	printf("Debug - I");
+	printf("Registro \t valor\n");
+	printf("0x80\t%x\n", AD5933_GetRegisterValue(0x80, 2));
+	printf("0x82\t%x\n", AD5933_GetRegisterValue(0x82, 3));
+	printf("0x85\t%x\n", AD5933_GetRegisterValue(0x85, 3));
+	printf("0x88\t%x\n", AD5933_GetRegisterValue(0x88, 2));
+	printf("0x8A\t%x\n", AD5933_GetRegisterValue(0x8A, 2));
+	printf("0x8F\t%x\n", AD5933_GetRegisterValue(0x8F, 1));
+	printf("0x92\t%x\n", AD5933_GetRegisterValue(0x92, 2));
+	printf("0x94\t%x\n", AD5933_GetRegisterValue(0x94, 2));
+	printf("0x96\t%x\n", AD5933_GetRegisterValue(0x96, 2));
+	printf("Debug - F");
 
 	// Start the sweep
 	printf("AD5933 - Start Sweep\n");
@@ -417,8 +427,8 @@ int main(void)
 			// printf("TEMPERATURE: %lu\n",TEMPERATURE);
 			fprintf(fout, "%f\t%f\t%lu\n", impedance, phase, CurrentFrequency);
 			fprintf(fout2, "%lu\t%d\t%d\t%f\t%f\n", CurrentFrequency, RealPart, ImagPart, impedance, phase);
-			//fprintf(gnuplot, "%lu %f\n", CurrentFrequency, impedance);
-			fprintf(gnuplot, "%lu %d\n", CurrentFrequency, ImagPart);
+			fprintf(gnuplot, "%lu %f\n", CurrentFrequency, impedance);
+			//fprintf(gnuplot, "%lu %d\n", CurrentFrequency, ImagPart);
 			//fprintf(gnuplot, "%lu %d\n", CurrentFrequency, ImagPart);
 
 			fflush(fout);

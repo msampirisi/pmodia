@@ -72,8 +72,7 @@ unsigned char currentRange = AD5933_RANGE_2000mVpp;
 *******************************************************************************/
 char AD5933_Init(void)
 {
-	unsigned char status = -1;
-
+	//unsigned char status = -1;
 	//status = I2C_Init(100000);
 	return 1;
 }
@@ -93,18 +92,13 @@ void AD5933_SetRegisterValue(unsigned char registerAddress,
 {
 	unsigned char byte = 0;
 	unsigned char writeData[2] = {0, 0};
-	int status;
+	// int status;
 
 	for (byte = 0; byte < bytesNumber; byte++)
 	{
 		writeData[0] = registerAddress + bytesNumber - byte - 1;
 		writeData[1] = (unsigned char)((registerValue >> (byte * 8)) & 0xFF);
 		wiringPiI2CWriteReg8(i2cdevice, writeData[0], writeData[1]);
-		//printf("\t\tWriting: 0x%x into 0x%x\n",writeData[1],writeData[0]);
-		//printf("Status = %d\n",status);
-		//printf("writeData[0]=0x%x\n",writeData[0]);
-		//printf("writeData[1]=0x%x\n",writeData[1]);
-		//I2C_Write(AD5933_ADDRESS, writeData, 2, 1);
 	}
 }
 
@@ -142,6 +136,26 @@ unsigned long AD5933_GetRegisterValue(unsigned char registerAddress,
 
 	return registerValue;
 }
+
+/***************************************************************************/ /**
+ * @brief Show all registers.
+ *
+ * @return None.
+*******************************************************************************/
+void AD5933_ShowAllRegisters(void){
+	printf("Debug - I\n");
+	printf("Registro     \t valor\n");
+	printf("0x80 Control \t%x\n", AD5933_GetRegisterValue(0x80, 2));
+	printf("0x82 Sta Freq\t%x\n", AD5933_GetRegisterValue(0x82, 3));
+	printf("0x85 Inc Freq\t%x\n", AD5933_GetRegisterValue(0x85, 3));
+	printf("0x88 Inc Cant\t%x\n", AD5933_GetRegisterValue(0x88, 2));
+	printf("0x8A S.T.Cycl\t%x\n", AD5933_GetRegisterValue(0x8A, 2));
+	printf("0x8F Status  \t%x\n", AD5933_GetRegisterValue(0x8F, 1));
+	printf("0x92 Temp.   \t%x\n", AD5933_GetRegisterValue(0x92, 2));
+	printf("0x94 Real Dat\t%x\n", AD5933_GetRegisterValue(0x94, 2));
+	printf("0x96 Img. Dat\t%x\n", AD5933_GetRegisterValue(0x96, 2));
+}
+
 
 /***************************************************************************/ /**
  * @brief Resets the device.
@@ -428,6 +442,7 @@ void AD5933_StartSweep(void)
 								AD5933_CONTROL_RANGE(currentRange) |
 								AD5933_CONTROL_PGA_GAIN(currentGain),
 							1);
+
 	// Reset device
 	AD5933_Reset();
 
@@ -445,6 +460,7 @@ void AD5933_StartSweep(void)
 								AD5933_CONTROL_RANGE(currentRange) |
 								AD5933_CONTROL_PGA_GAIN(currentGain),
 							1);
+
 	status = 0;
 	while ((status & AD5933_STAT_DATA_VALID) == 0)
 	{
@@ -467,8 +483,8 @@ double AD5933_CalculateGainFactor(unsigned long calibrationImpedance,
 	double gainFactor = 0;
 	double magnitude = 0;
 	int status = 0;
-	signed short realData = 0;
-	signed short imgData = 0;
+	//signed short realData = 0;
+	//signed short imgData = 0;
 
 	// Repeat frequency sweep with last set parameters
 	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
@@ -557,8 +573,8 @@ double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedan
 	double gainFactor = 0;
 	double magnitude = 0;
 	int status = 0;
-	signed short realData = 0;
-	signed short imgData = 0;
+	//signed short realData = 0;
+	//signed short imgData = 0;
 
 	// Repeat frequency sweep with last set parameters
 	AD5933_SetRegisterValue(AD5933_REG_CONTROL_HB,
@@ -644,10 +660,10 @@ double AD5933_CalculateGainFactorAndSystemPhase(unsigned long calibrationImpedan
 double AD5933_CalculateImpedance(double gainFactor,
 								 char freqFunction)
 {
-	signed short realData = 0;
-	signed short imgData = 0;
+	//signed short realData = 0;
+	//signed short imgData = 0;
 	double magnitude = 0;
-	double impedance = 0;
+	//double impedance = 0;
 	int status = 0;
 
 	// Repeat frequency sweep with last set parameters
@@ -913,11 +929,11 @@ double AD5933_CalculatePhaseRAD(signed short RealPart, signed short ImagPart)
 	{
 		phase = 2 * M_PI + atan(ImagPart / RealPart);
 	}
-	else if (RealPart = 0 && ImagPart >= 0)
+	else if (RealPart == 0 && ImagPart >= 0)
 	{
 		phase = M_PI / 2;
 	}
-	else if (RealPart = 0 && ImagPart < 0)
+	else if (RealPart == 0 && ImagPart < 0)
 	{
 		phase = M_PI + M_PI / 2;
 	}
